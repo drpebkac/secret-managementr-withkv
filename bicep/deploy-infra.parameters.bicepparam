@@ -10,7 +10,7 @@ param tags = {
   serviceProvider: 'Arinco'
 }
 
-var prefix = 'shd-secrets-mgmt'
+var prefix = 'ccv-srt-mgmr'
 var storagePrefix = toLower(replace(prefix, '-', ''))
 
 param functionAppName = '${prefix}-func'
