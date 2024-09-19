@@ -1,0 +1,33 @@
+{
+  "disabled": false,
+  "bindings": [
+    {
+      "name": "Timer",
+      "authLevel": "function",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "%SM_SCHEDULE_CRON%"
+    },
+    {
+      "name": "storeSecretExpiryReport",
+      "direction": "out",
+      "type": "blob",
+      "path": "sm-key-vault-expiry-reports/keyvault-secret-expiryreport-{datetime:dd-MM-yyyy}.csv",
+      "connection": "SM_REPORT_STORAGE"
+    },
+    {
+      "name": "storeCertExpiryReport",
+      "direction": "out",
+      "type": "blob",
+      "path": "sm-key-vault-expiry-reports/keyvault-cert-expiryreport-{datetime:dd-MM-yyyy}.csv",
+      "connection": "SM_REPORT_STORAGE"
+    },
+    {
+      "name": "kvErrorLogs",
+      "direction": "out",
+      "type": "blob",
+      "path": "sm-key-vault-error-logs/keyvault-errorlog-{datetime:dd-MM-yyyy}.csv",
+      "connection": "SM_REPORT_STORAGE"
+    }
+  ]
+}

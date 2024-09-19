@@ -1,0 +1,19 @@
+{
+  "disabled": false,
+  "bindings": [
+    {
+      "name": "Timer",
+      "authLevel": "function",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "%SM_SCHEDULE_CRON%"
+    },
+    {
+      "name": "storeExpiryAppRegReport",
+      "direction": "out",
+      "type": "blob",
+      "path": "sm-app-reg-expiry-reports/appregexpiryreport-{datetime:dd-MM-yyyy}.csv",
+      "connection": "SM_REPORT_STORAGE"
+    }
+  ]
+}
