@@ -1,0 +1,27 @@
+name: Deploy Azure Infrastructure for secret checker
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscriptionId:
+        description: 'The subscription to deploy the infra resources to.'
+        required: true
+        default: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+      environment:
+        description: The github environment to use for this deployment.
+        required: true
+        default: '[Insert Svc Connection here]'
+      location:
+        description: The geolocation where the infrastructure resources will be residing at
+        required: true
+        default: 'Australia East'
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
