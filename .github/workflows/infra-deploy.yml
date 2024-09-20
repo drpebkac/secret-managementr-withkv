@@ -49,7 +49,6 @@ jobs:
         run: echo "Initialising environment variables"
 
   build:
-    concurrency: ${{ needs.initialise_vars.outputs.environment }}
     needs: initialise_vars
     permissions:
       id-token: write
