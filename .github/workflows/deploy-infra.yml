@@ -45,7 +45,7 @@ jobs:
       skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
       mode: ${{ needs.initialise_vars.outputs.mode }}
       continue_on_failed_tests: false
-      environments: ${{ needs.initialise_vars.outputs.environment }}
+      environment: ${{ needs.initialise_vars.outputs.environment }}
 
   
   
