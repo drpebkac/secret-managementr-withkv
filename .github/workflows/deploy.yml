@@ -92,7 +92,7 @@ jobs:
         if: inputs.mode == 'operations'
         run: |
           $ErrorActionPreference = 'stop'
-          $files = Get-ChildItem ${{ runner.workspace }}/deploy/param | Where-Object {$_.Name -like "*.json"}
+          $files = Get-ChildItem ${{ runner.workspace }}/deploy/param | Where-Object {$_.Name -like "*.json" -or $_.Name -like "*.bicepparam"}
           $template = "${{ inputs.template_file_name }}".Replace(".bicep",".json")
           $files
           foreach ($file in $files) {
@@ -199,7 +199,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'stop'
           $template = "${{ inputs.template_file_name }}".Replace(".bicep",".json")
-          $files = Get-ChildItem ${{ runner.workspace }}/deploy/param | Where-Object {$_.Name -like "*.parameters.json"}
+          $files = Get-ChildItem ${{ runner.workspace }}/deploy/param | Where-Object {$_.Name -like "*.json" -or $_.Name -like "*.bicepparam"}
           foreach ($file in $files) {
             if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
               $paramFile = Get-Content $file.FullName | ConvertFrom-Json
