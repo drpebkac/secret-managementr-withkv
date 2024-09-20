@@ -15,9 +15,9 @@ jobs:
   initialise_vars:
     runs-on: ubuntu-latest
     outputs:
-      template_folder_path: ${{ env.template_file_path }}
+      template_folder_path: ${{ env.template_folder_path }}
       template_file_name: ${{ env.template_file_name }}
-      parameter_file_path: ${{ env.parameter_file_path }}
+      parameter_file_name: ${{ env.parameter_file_name }}
       location: ${{ env.location }}
       subscription_id: ${{ env.subscription_id }}
       oidc_app_reg_client_id: ${{ env.oidc_app_reg_client_id }}
@@ -36,12 +36,12 @@ jobs:
       id-token: write # Require write permission to Fetch an OIDC token.
       contents: read
     uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
-    secrets: inherit
+    secrets: inherit # wtf github workflow
     with:
       test_trigger: ${{ github.event_name }}
       template_folder_path: ${{ needs.initialise_vars.outputs.template_folder_path }}
       template_file_name: ${{ needs.initialise_vars.outputs.template_file_name }}
-      parameter_file_path: "${{ needs.initialise_vars.outputs.template_folder_path }}/${{ needs.initialise_vars.outputs.parameter_file_name}}"
+      parameter_file_name: ${{ needs.initialise_vars.outputs.parameter_file_name }}
       skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
       mode: ${{ needs.initialise_vars.outputs.mode }}
       continue_on_failed_tests: false

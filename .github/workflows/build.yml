@@ -11,7 +11,7 @@ on:
         description: "name of the bicep template"
         type: string
         required: true
-      parameter_file_path:
+      parameter_file_name:
         description: "name of the parameter file"
         type: string
         required: false
