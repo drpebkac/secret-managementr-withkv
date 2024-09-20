@@ -7,11 +7,6 @@ on:
         description: "path to template file"
         type: string
         required: true
-      parameter_file_path:
-        description: "path to the parameter file"
-        type: string
-        required: false
-        default: ""
       parameter_file_name:
         description: "name of the parameter file"
         type: string
@@ -36,38 +31,37 @@ on:
         type: string
         required: false
         default: build
-      # oidc_app_reg_client_id:
-      #   description: "client id of the azure application registration used to authenticate to azure using oidc, refer to https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions"
-      #   type: string
-      #   required: true
-      # azure_tenant_id:
-      #   description: "azure ad tenant/directory id"
-      #   type: string
-      #   required: true
       environment:
         description: "github environment for build jobs"
         type: string
         required: false
         default: build
 
-jobs: 
-  test:
-    environment: prod
-    runs-on: ubuntu-latest    
-    steps:
-    - name: Azure CLI Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.CLIENT_ID }}
-        tenant-id: ${{ secrets.TENANT_ID }}
-        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
-  
-    - name: Azure CLI script
-      uses: azure/cli@v2
-      with:
-        azcliversion: latest
-        inlineScript: |
-          az account show
-          # You can write your Azure CLI inline scripts here.
+env:
+  build_folder: build
+  test_result_folder: results
 
+jobs:
+  run_build:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
     
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+            # You can write your Azure CLI inline scripts here.
+
+      
