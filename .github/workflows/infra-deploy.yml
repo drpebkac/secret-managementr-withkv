@@ -39,7 +39,7 @@ jobs:
       parameter_file_path: ${{ env.parameter_file_path }}
       location: '${{ inputs.location }}'
       subscription_id: '${{ inputs.subscriptionId }}'
-      environment: '${{ inputs.environment }}'
+      environment: 'prod'
       deployment_name: ${{ env.deployment_name }}
       skip_tests: ${{ env.skip_tests }}
       mode: ${{ env.mode }}
