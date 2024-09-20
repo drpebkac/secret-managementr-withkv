@@ -57,6 +57,7 @@ jobs:
     uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
     with:
       test_trigger: ${{ github.event_name }}
+      environment: ${{ needs.initialise_vars.outputs.environment }}
       template_file_path: ${{ needs.initialise_vars.outputs.template_folder_path }}/${{ needs.initialise_vars.outputs.template_file_name }}
       skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
       mode: ${{ needs.initialise_vars.outputs.mode }}
