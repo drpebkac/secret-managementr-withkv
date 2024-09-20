@@ -66,8 +66,7 @@ on:
 jobs: 
   run_preview:
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Set current date as environment variable
         run: echo "current_time=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
