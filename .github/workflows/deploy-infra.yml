@@ -15,19 +15,19 @@ env:
   skip_tests: "'apiVersions Should Be Recent','Template Should Not Contain Blanks','Parameter Types Should Be Consistent','Parameters Must Be Referenced','Min And Max Value Are Numbers','Location Should Not Be Hardcoded','Password params must be secure','Outputs Must Not Contain Secrets', 'URIs Should Be Properly Constructed'"
   environment: "prod"
 
-
-build:
-  uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
-  with:
-    test_trigger: ${{ github.event_name }}
-    template_file_path: ${{ env.template_file_path }}
-    template_file_name: ${{ env.template_file_name }}
-    parameter_file_path: ${{ env.template_file_path}}/${{ env.parameter_file_name}}
-    skip_tests: ${{ env.skip_tests }}
-    mode: ${{ env.mode }}
-    continue_on_failed_tests: false
-    environment: ${{ env.environment }}
-
-
-
-
+jobs:
+  build:
+    uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
+    with:
+      test_trigger: ${{ github.event_name }}
+      template_file_path: ${{ env.template_file_path }}
+      template_file_name: ${{ env.template_file_name }}
+      parameter_file_path: ${{ env.template_file_path}}/${{ env.parameter_file_name}}
+      skip_tests: ${{ env.skip_tests }}
+      mode: ${{ env.mode }}
+      continue_on_failed_tests: false
+      environment: ${{ env.environment }}
+  
+  
+  
+  
