@@ -6,23 +6,23 @@ on:
     branches:
       - main
     paths:
-      - scripts/function-apps/secrets-management/*
+      - function-apps/secrets-management/*
   pull_request:
     branches:
       - main
     paths:
-      - scripts/function-apps/secrets-management/*
+      - function-apps/secrets-management/*
 
 env:
   location: "australiaeast" # location for resource deployment in azure
-  subscription_id: "ed439706-2678-4a1a-b0f7-44cd87e642ee" # azure subscription id (not required for tenant level deployments)
-  oidc_app_reg_client_id: "6a547723-e318-44f7-828f-9175e2211356" # client id of the azure application registration used to authenticate to azure using oidc, refer to https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions
-  azure_tenant_id: "6bd11972-e576-4984-abac-68b11846b79f" # azure ad tenant/directory id
-  environment: "production" # name of the github environment
+  subscription_id: "e6dffdaa-5ee9-4ea5-9330-1f148f3f2884" # azure subscription id (not required for tenant level deployments)
+  oidc_app_reg_client_id: "a1091385-06b9-4f70-ae46-bc38aa29ca44" # client id of the azure application registration used to authenticate to azure using oidc, refer to https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions
+  azure_tenant_id: "34846174-e57d-4384-9114-59a7f95fcada" # azure ad tenant/directory id
+  environment: "prod" # name of the github environment
   deployment_name: "operations_platform_secrets-checker-code" # name of the arm deployment"
-  function_appcodedir: "scripts/function-apps/secrets-management"
-  function_app_name: "ea-ae-secretschecker-func"
-  function_app_rg: "ea-ae-prod-global-secretschecker"
+  function_appcodedir: "function-apps/secrets-management"
+  function_app_name: "ccv-srt-mgmr-func"
+  function_app_rg: "secrets-management-rg"
 jobs:
   initialise_vars:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
 
   build_code:
     needs: initialise_vars
-    uses: eventsair/eventsair-azure-platform/.github/workflows/code_build.yml@main
+    uses: drpebkac/secret-managementr-withkv/.github/workflows/code_build.yml@main
     with:
       function_appcodedir: ${{ needs.initialise_vars.outputs.function_appcodedir }}
 
@@ -53,7 +53,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: eventsair/eventsair-azure-platform/.github/workflows/code_deploy.yml@main
+    uses: drpebkac/secret-managementr-withkv/.github/workflows/code_deploy.yml@main
     with:
       function_app_name: ${{ needs.initialise_vars.outputs.function_app_name }}
       function_app_rg: ${{ needs.initialise_vars.outputs.function_app_rg}}
