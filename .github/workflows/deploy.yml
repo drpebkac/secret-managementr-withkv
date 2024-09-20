@@ -92,8 +92,6 @@ jobs:
         if: inputs.mode == 'operations'
         run: |
           $ErrorActionPreference = 'stop'
-          Write-Host ${{ runner.workspace }}
-          ls ${{ runner.workspace }}
           mkdir '${{ runner.workspace }}/deploy/param'
           $files = Get-ChildItem ${{ runner.workspace }}/deploy/param | Where-Object {$_.Name -like "*.json" }
           $template = "${{ inputs.template_file_name }}".Replace(".bicep",".json")
@@ -202,6 +200,8 @@ jobs:
         if: inputs.mode == 'operations'
         run: |
           $ErrorActionPreference = 'stop'
+          mkdir '${{ runner.workspace }}/deploy/param'
+          write-Host ${{ runner.workspace }}
           $template = "${{ inputs.template_file_name }}".Replace(".bicep",".json")
           $files = Get-ChildItem ${{ runner.workspace }}/deploy/param | Where-Object {$_.Name -like "*.parameters.json"}
           foreach ($file in $files) {
