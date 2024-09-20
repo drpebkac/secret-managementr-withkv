@@ -36,6 +36,7 @@ jobs:
       id-token: write # Require write permission to Fetch an OIDC token.
       contents: read
     uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
+    secrets: inherit
     with:
       test_trigger: ${{ github.event_name }}
       template_folder_path: "${{ needs.initialise_vars.outputs.template_folder_path }}"
@@ -44,10 +45,7 @@ jobs:
       skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
       mode: ${{ needs.initialise_vars.outputs.mode }}
       continue_on_failed_tests: false
-      environment: ${{ needs.initialise_vars.outputs.environment }}
-      oidc_app_reg_client_id: ${{ secret.CLIENT_ID }}
-      subscription_id: ${{ secret.SUBSCRIPTION_ID }}
-      tenant_id: ${{ secret.TENANT_ID }}
+      environments: ${{ needs.initialise_vars.outputs.environment }}
 
   
   
