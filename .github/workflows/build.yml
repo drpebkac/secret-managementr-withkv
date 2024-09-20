@@ -36,14 +36,6 @@ on:
         type: string
         required: false
         default: build
-      oidc_app_reg_client_id:
-        description: "client id of the azure application registration used to authenticate to azure using oidc, refer to https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions"
-        type: string
-        required: true
-      azure_tenant_id:
-        description: "azure ad tenant/directory id"
-        type: string
-        required: true
       environment:
         description: "github environment for build jobs"
         type: string
@@ -57,8 +49,7 @@ env:
 jobs:
   run_build:
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3.3.0
@@ -66,9 +57,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1.4.6
         with:
-          client-id: ${{ inputs.oidc_app_reg_client_id }}
-          tenant-id: ${{ inputs.azure_tenant_id }}
-          allow-no-subscriptions: true
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
       - name: Get all changed param files
         id: changed-markdown-files
