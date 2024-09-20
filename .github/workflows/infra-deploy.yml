@@ -29,6 +29,8 @@ env:
   parameter_file_name: deploy-sm-infra.bicepparam
 
 jobs:
+  concurrency: ${{ inputs.environment }}
+  environment: ${{ inputs.environment }}
   initialise_vars:
     runs-on: ubuntu-latest
     outputs:

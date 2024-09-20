@@ -52,7 +52,8 @@ permissions:
 
 jobs:
   run_build:
-    environment: prod
+    concurrency: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
