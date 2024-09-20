@@ -1,4 +1,4 @@
-using 'deploy-infra.bicep'
+using 'deploy-sm-infra.bicep'
 
 // Resource naming prefix will vary for different customer, change values as accordingly to customer's naming conventions
 
@@ -10,7 +10,7 @@ param tags = {
   serviceProvider: 'Arinco'
 }
 
-var prefix = 'shd-secrets-mgmt'
+var prefix = 'ccv-srt-mgmr'
 var storagePrefix = toLower(replace(prefix, '-', ''))
 
 param functionAppName = '${prefix}-func'

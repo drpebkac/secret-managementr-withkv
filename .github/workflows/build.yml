@@ -1,0 +1,227 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      template_file_path:
+        description: "path to template file"
+        type: string
+        required: true
+      parameter_file_path:
+        description: "path to the parameter file"
+        type: string
+        required: false
+        default: ""
+      parameter_file_name:
+        description: "name of the parameter file"
+        type: string
+        required: false
+        default: ""
+      continue_on_failed_tests:
+        description: "silence errors from testing and continue pipeline"
+        type: boolean
+        required: false
+        default: false
+      skip_tests:
+        description: "arm-ttk tests to skip, e.g. 'Template Should Not Contain Blank'"
+        type: string
+        required: false
+        default: none
+      test_trigger:
+        description: "github event that will trigger tests to run, e.g. pull request"
+        type: string
+        required: true
+      mode:
+        description: "the contextual mode of the build, e.g. whether it is part of the initial build or ongoing operations"
+        type: string
+        required: false
+        default: build
+      oidc_app_reg_client_id:
+        description: "client id of the azure application registration used to authenticate to azure using oidc, refer to https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions"
+        type: string
+        required: true
+      azure_tenant_id:
+        description: "azure ad tenant/directory id"
+        type: string
+        required: true
+      environment:
+        description: "github environment for build jobs"
+        type: string
+        required: false
+        default: build
+
+env:
+  build_folder: build
+  test_result_folder: results
+
+jobs:
+  run_build:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+
+      - name: Login to Azure
+        uses: azure/login@v1.4.6
+        with:
+          client-id: ${{ inputs.oidc_app_reg_client_id }}
+          tenant-id: ${{ inputs.azure_tenant_id }}
+          allow-no-subscriptions: true
+
+      - name: Get all changed param files
+        id: changed-markdown-files
+        uses: tj-actions/changed-files@v42
+        with:
+          # Avoid using single or double quotes for multiline patterns
+          files: ${{ inputs.parameter_file_path }}/**
+
+      - name: List all changed files markdown files
+        if: steps.changed-markdown-files.outputs.any_changed == 'true'
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
+        run: |
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done          
+
+      - name: Build Bicep into ARM
+        env:
+          BUILDFOLDERPATH: ${{ runner.temp }}/${{ env.build_folder }}
+          TESTFOLDERPATH: ${{ runner.temp }}/${{ env.test_result_folder }}
+          ALL_CHANGED_FILES: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
+          ANY_CHANGED_FILES: ${{ steps.changed-markdown-files.outputs.any_changed }}
+        run: |
+          mkdir '${{ env.BUILDFOLDERPATH }}'
+          mkdir '${{ env.BUILDFOLDERPATH }}/param'
+          az bicep build --file ${{ inputs.template_file_path }} --outdir '${{ env.BUILDFOLDERPATH }}'
+
+          if ("${{ inputs.mode }}" -ne "operations"){
+            if ("${{ inputs.parameter_file_path }}" -like "*.bicepparam"){
+                bicep build-params "${{ inputs.parameter_file_path }}" --outfile ${{ env.BUILDFOLDERPATH }}/azuredeploy.parameters.json
+              }
+            elseif ("${{ inputs.parameter_file_path }}" -like "*.json"){
+                Copy-Item -Path "${{ inputs.parameter_file_path }}" -Destination '${{ env.BUILDFOLDERPATH }}'
+              }
+          }
+          #If condition for 
+          # copy parameter files to build folder if operations deployment
+          if ("${{ inputs.mode }}" -eq "operations" && "${{ env.ANY_CHANGED_FILES }}" -eq "true" ){
+            #$files = Get-ChildItem "${{ inputs.parameter_file_path }}" | Where-Object {$_.Name -like "*.parameters.json" -or $_.Name -like "*.bicepparam"}
+            $files = "${{ env.ALL_CHANGED_FILES }}"
+            $splitFiles =$files.Split(" ")
+            write-output $splitFiles
+            foreach ($file in $splitFiles){
+                if ($file -like "*.bicepparam"){                          
+                  write-output $file
+                  bicep build-params $file --outfile $file.Replace(".bicepparam", ".parameters.json")
+                  Copy-Item -Path $file.Replace(".bicepparam", ".parameters.json") -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                    }
+                  }
+                }
+                elseif ("${{ inputs.mode }}" -eq "operations" && "${ANY_CHANGED_FILES}" -ne "true" ){
+                  $files = Get-ChildItem "${{ inputs.parameter_file_path }}" | Where-Object {$_.Name -like "*.parameters.json" -or $_.Name -like "*.bicepparam"}
+                  foreach ($file in $files){
+                  if ($file.FullName -like "*.bicepparam"){
+                  bicep build-params $file.FullName --outfile $file.FullName.Replace(".bicepparam", ".parameters.json")
+                  Copy-Item -Path $file.FullName.Replace(".bicepparam", ".parameters.json") -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                }
+                else{
+                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                }
+              }
+          }
+          if ("${{ inputs.mode }}" -eq "operations" && "${{ inputs.parameter_file_name }}" -ne "" ){
+            if ("${{ inputs.parameter_file_path }}/${{ inputs.parameter_file_name }}" -like "*.bicepparam"){
+              $paramName="${{ inputs.parameter_file_name }}"
+              $paramName=$paramName.Replace(".bicepparam", ".parameters.json")
+                bicep build-params "${{ inputs.parameter_file_path }}/${{ inputs.parameter_file_name }}" --outfile "${{ env.BUILDFOLDERPATH }}/param/$paramName"
+                }
+            elseif ("${{ inputs.parameter_file_path }}/${{ inputs.parameter_file_name }}" -like "*.json"){
+                Copy-Item -Path "${{ inputs.parameter_file_path }}/${{ inputs.parameter_file_name }}" -Destination '${{ env.BUILDFOLDERPATH }}/param'
+              }
+          }
+        shell: pwsh
+
+      - name: Run Tests
+        if: ${{ inputs.test_trigger == 'pull_request' }}
+        env:
+          SKIPTESTS: "${{ inputs.skip_tests }}"
+          BUILDFOLDERPATH: ${{ runner.temp }}/${{ env.build_folder }}
+          TESTFOLDERPATH: ${{ runner.temp }}/${{ env.test_result_folder }}
+        run: |
+          # Download and import arm-ttk and pester modules
+          wget https://aka.ms/arm-ttk-latest
+          Rename-Item -Path arm-ttk-latest -NewName arm-ttk-latest.zip
+          Expand-Archive -Path arm-ttk-latest.zip
+          Import-Module ./arm-ttk-latest/arm-ttk/arm-ttk.psd1
+          Install-Module Pester -AllowClobber -RequiredVersion 4.10.1 -Force -SkipPublisherCheck -AcceptLicense
+          # Create test files
+          mkdir ${{ env.TESTFOLDERPATH }}
+          $templateFile = Get-Item "${{ inputs.template_file_path }}"
+          $armTemplate = "${{ env.BUILDFOLDERPATH }}/" + $templateFile.Name.replace('.bicep', '.json')
+          New-Item -Path ${{ env.BUILDFOLDERPATH }}/armttk.tests.ps1 -Value ('param ($exclusions = "");Test-AzTemplate -TemplatePath ' + $armTemplate + ' -Skip $exclusions -Pester') -Force
+          az bicep build --file ${{ inputs.template_file_path }} --outdir '${{ env.BUILDFOLDERPATH }}'
+          # Run tests
+          if ("${{ env.SKIPTESTS }}" -ne "none") {
+            $results = Invoke-Pester -Script @{Path="${{ env.BUILDFOLDERPATH }}/armttk.tests.ps1"; Parameters= @{exclusions = ${{ env.SKIPTESTS }}}} -OutputFormat NUnitXml -OutputFile ${{ env.TESTFOLDERPATH }}/TEST-armttk.xml -PassThru
+          }
+          else{
+            $results = Invoke-Pester -Script @{Path="${{ env.BUILDFOLDERPATH }}/armttk.tests.ps1"} -OutputFormat NUnitXml -OutputFile ${{ env.TESTFOLDERPATH }}/TEST-armttk.xml -PassThru
+          }
+          if ("${{ inputs.continue_on_failed_tests }}" -eq "false") {
+            if ($results.TestResult.Result -contains "Failed") {
+              Write-Output "TESTRESULTS=FAIL" >> $env:GITHUB_ENV
+            }
+          }
+        shell: pwsh
+
+      - name: Generate Test results
+        if: ${{ inputs.test_trigger == 'pull_request' }}
+        env:
+          TESTFOLDERPATH: ${{ runner.temp }}/${{ env.test_result_folder }}
+        run: |
+          $nunitResults = [xml] (Get-Content ${{ env.TESTFOLDERPATH }}/*-armttk.xml)
+          $markdown = ''
+          $markdown += "| Test | Test Case | Result |"
+          $markdown += "`n |:-------- | :-------- | :----- |"
+          $testCount = 0
+          foreach ($test in $nunitResults.'test-results'.'test-suite'.results.'test-suite'.results.'test-suite'.results.'test-suite')
+          {
+            foreach ($testcase in $test.results.'test-case')
+            {
+              $testNumber = $testCount += 1
+              $testDesc = $testcase.description
+              $result = $testcase.result
+              if ($result -eq 'Success') {
+                  $result = ':white_check_mark:'
+              } else {
+                  $result = ':x:'
+              }
+              $markdown += "`n | $testNumber | $testDesc | $result |"
+            }
+          }
+          Set-Content -Path ${{ env.TESTFOLDERPATH }}/test-results.md -Value $markdown
+          Get-Content ${{ env.TESTFOLDERPATH }}/test-results.md > $GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      - name: Publish Test Results
+        if: ${{ inputs.test_trigger == 'pull_request' }}
+        env:
+          TESTFOLDERPATH: ${{ runner.temp }}/${{ env.test_result_folder }}
+        run: |
+          echo "### Test Results :robot:" > $GITHUB_STEP_SUMMARY
+          cat ${{ env.TESTFOLDERPATH }}/test-results.md >> $GITHUB_STEP_SUMMARY
+          if [ $TESTRESULTS == 'FAIL' ]; then
+            echo "::error::TESTS FAILED!"
+            exit 1
+          fi
+
+      - name: Publish Pipeline Artifact
+        env:
+          BUILDFOLDERPATH: ${{ runner.temp }}/${{ env.build_folder }}
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: deploy
+          path: "${{ env.BUILDFOLDERPATH }}"
