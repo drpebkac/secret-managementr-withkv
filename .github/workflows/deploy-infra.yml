@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  template_file_path: "bicep/secret-management"
+  template_folder_path: "bicep/secret-management"
   template_file_name: "deploy-sm-infra"
   parameter_file_name: "deploy-sm-infra.parameters.bicepparam"
   mode: "operations"
@@ -38,13 +38,17 @@ jobs:
     uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
     with:
       test_trigger: ${{ github.event_name }}
-      template_file_path: ${{ needs.initialise_vars.outputs.template_file_path }}
+      template_folder_path: "${{ needs.initialise_vars.outputs.template_folder_path }}"
       template_file_name: ${{ needs.initialise_vars.outputs.template_file_name }}
-      parameter_file_path: ${{ needs.initialise_vars.outputs.template_file_path}}/${{ needs.initialise_vars.outputs.parameter_file_name}}
+      parameter_file_path: "${{ needs.initialise_vars.outputs.template_folder_path }}/${{ needs.initialise_vars.outputs.parameter_file_name}}"
       skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
       mode: ${{ needs.initialise_vars.outputs.mode }}
       continue_on_failed_tests: false
       environment: ${{ needs.initialise_vars.outputs.environment }}
+      oidc_app_reg_client_id: ${{ secret.CLIENT_ID }}
+      subscription_id: ${{ secret.SUBSCRIPTION_ID }}
+      tenant_id: ${{ secret.TENANT_ID }}
+
   
   
   

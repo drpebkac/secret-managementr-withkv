@@ -40,6 +40,19 @@ on:
         type: string
         required: false
         default: build
+      oidc_app_reg_client_id:
+        description: "the Entra ID app ID used by Github to authenticate to Azure"
+        type: string
+        required: true
+      subscription_id:
+        description: "The Azure subscription ID associated with this deployment"
+        type: string
+        required: true
+      tenant_id:
+        description: "The Azure tenant associated with this deployment"
+        type: string
+        required: true
+      
 
 env:
   build_folder: build
