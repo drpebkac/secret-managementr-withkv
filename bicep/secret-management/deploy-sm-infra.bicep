@@ -51,7 +51,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
 }
 
 // Deploys storage account for secret expiry reports to store in
-module storageAccountModule 'modules/storage/storage-accounts/main.bicep' = {
+module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = {
   name: 'deploy_storage_account'
   scope: rg
   params: {
@@ -62,7 +62,7 @@ module storageAccountModule 'modules/storage/storage-accounts/main.bicep' = {
   }
 }
 
-module containerModule 'modules/storage/blob/main.bicep' = if (!empty(containers)) {
+module containerModule '../modules/storage/blob/main.bicep' = if (!empty(containers)) {
   name: 'container_deploy'
   scope: rg
   dependsOn: [
@@ -84,7 +84,7 @@ var defaultAppSettings = {
 
 var finalAppSettings = union(defaultAppSettings, appSettings)
 
-module logAnalytics 'modules/log-analytics/log-analytics.bicep' = {
+module logAnalytics '../modules/log-analytics/log-analytics.bicep' = {
   name: 'deploy_law'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -94,7 +94,7 @@ module logAnalytics 'modules/log-analytics/log-analytics.bicep' = {
 }
 
 //Deploy application insights for function app
-module applicationInsights 'modules/insights/components/main.bicep' = {
+module applicationInsights '../modules/insights/components/main.bicep' = {
   name: 'deploy_fa_applicationInsights'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -105,7 +105,7 @@ module applicationInsights 'modules/insights/components/main.bicep' = {
   }
 }
 
-module appServicePlan 'modules/web/server-farms/main.bicep' = {
+module appServicePlan '../modules/web/server-farms/main.bicep' = {
   name: 'deploy_serverFarm'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -117,7 +117,7 @@ module appServicePlan 'modules/web/server-farms/main.bicep' = {
   }
 }
 
-module functionAppModule 'modules/web/sites/main.bicep' = {
+module functionAppModule '../modules/web/sites/main.bicep' = {
   name: 'deploy_fa'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -144,7 +144,7 @@ module functionAppModule 'modules/web/sites/main.bicep' = {
 var roleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b')
 
 //Grants function RBAC permissions to KV
-module rbacAssignments 'modules/authorization/role-assignments/main.bicep' = {
+module rbacAssignments '../modules/authorization/role-assignments/main.bicep' = {
   name: 'deploy_RbacPermissions'
   scope: resourceGroup(resourceGroupName)
   params: {

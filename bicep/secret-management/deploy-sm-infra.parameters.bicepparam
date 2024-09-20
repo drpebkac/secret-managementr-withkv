@@ -1,4 +1,4 @@
-using 'deploy-infra.bicep'
+using 'deploy-sm-infra.bicep'
 
 // Resource naming prefix will vary for different customer, change values as accordingly to customer's naming conventions
 

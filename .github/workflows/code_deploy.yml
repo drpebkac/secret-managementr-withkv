@@ -1,0 +1,68 @@
+name: code_deploy
+
+on:
+  workflow_call:
+    inputs:
+      function_app_name:
+        description: "the name of the function app in which the code is deployed to"
+        type: string
+      function_app_rg:
+        description: "resource group in which the function app belongs to"
+        type: string
+      environment:
+        description: "environment for this deployment"
+        type: string
+      subscription_id:
+        description: "azure subscription id used for deployments"
+        type: string
+        required: true
+      oidc_app_reg_client_id:
+        description: "The app registration id for this pipeline on Azure AD"
+        type: string
+        required: true
+      azure_tenant_id:
+        description: "azure ad tenant/directory id"
+        type: string
+        required: true
+
+env:
+  deployment_name: "deploy_sctmgr_code" # name of the arm deployment"
+
+jobs:
+  deploy_code:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }} 
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: 'Checkout gitHub action'
+        uses: actions/checkout@v3
+
+      - name: Prepare artifacts directory
+        run: |
+          mkdir ${{ runner.workspace }}/deploy
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy_code
+          path: ${{ runner.workspace }}/deploy
+
+      - name: Authenticate to Azure
+        uses: azure/login@v1.4.6
+        with:
+          client-id: ${{ inputs.oidc_app_reg_client_id }}
+          tenant-id: ${{ inputs.azure_tenant_id }}
+          subscription-id: ${{ inputs.subscription_id }}
+          enable-AzPSSession: true
+
+      - name: Deploy function app
+        run: |
+          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.workspace }}/deploy/fa-code.zip --verbose
+            
+      - name: 'Cleanup deploy folder'
+        run: |
+          rm -r ${{ runner.workspace }}/deploy
+      - uses: actions/checkout@v2
