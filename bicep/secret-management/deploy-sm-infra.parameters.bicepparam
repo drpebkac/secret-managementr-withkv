@@ -39,7 +39,7 @@ param appSettings = {
   SM_NEAR_EXPIRY_DAYS: 28 // Number of days to look back for secrets that are about to expire
   SM_APP_EXCLUSION_LIST: '' // Comma separated list of app registrations to exclude from the report
   SM_NOTIFY_EMAIL_ENABLED: 'Enabled' // Use 'Enabled' or 'Disabled'
-  SM_NOTIFY_EMAIL_FROM_ADDRESS: 'itsupport@racgp.org.au' // Email address to send the report from
+  SM_NOTIFY_EMAIL_FROM_ADDRESS: 'itsupport@ittttt.it' // Email address to send the report from
   SM_NOTIFY_EMAIL_TO_ADDRESS: 'abc@def.hij,klm@nop' // Comma separated list of email addresses to send the report to
   SM_APP_REG_REPORT_MAIL_SUBJECT: '[IMPORTANT] Your app registration secrets are due to expire'
   SM_APP_REG_REPORT_MAIL_MESSAGE: '<p>Hello<br>\n<br>\nPlease be advised that you have app registration secrets that are due to expire. <br>\n<br>\nAttached is a report listing the secrets.<br>\n<br>\nIt is crucial the secrets listed are renewed, prior to its expiry date to avoid downtime with your services. <br>\n<br>\nThank you</p>'
