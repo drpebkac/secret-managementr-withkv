@@ -3,7 +3,7 @@ name: build
 on:
   workflow_call:
     inputs:
-      template_file_path:
+      template_folder_path:
         description: "path to template file"
         type: string
         required: true
