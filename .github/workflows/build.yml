@@ -46,6 +46,10 @@ env:
   build_folder: build
   test_result_folder: results
 
+permissions:
+  id-token: write # Require write permission to Fetch an OIDC token.
+  contents: read
+
 jobs:
   run_build:
     runs-on: ubuntu-latest
