@@ -3,10 +3,6 @@ name: Deploy Infrastructure for Secret Management utility
 on:
   workflow_dispatch:
 
-permissions:
-  id-token: write # Require write permission to Fetch an OIDC token.
-  contents: read
-
 env:
   template_file_path: "bicep/secret-management"
   template_file_name: "deploy-sm-infra"
@@ -16,17 +12,39 @@ env:
   environment: "prod"
 
 jobs:
+  initialise_vars:
+    runs-on: ubuntu-latest
+    outputs:
+      template_folder_path: ${{ env.template_file_path }}
+      template_file_name: ${{ env.template_file_name }}
+      parameter_file_path: ${{ env.parameter_file_path }}
+      location: ${{ env.location }}
+      subscription_id: ${{ env.subscription_id }}
+      oidc_app_reg_client_id: ${{ env.oidc_app_reg_client_id }}
+      azure_tenant_id: ${{ env.azure_tenant_id }}
+      environment: ${{ env.environment }}
+      deployment_name: ${{ env.deployment_name }}
+      skip_tests: ${{ env.skip_tests }}
+      mode: ${{ env.mode }}
+    steps:
+      - name: Initialise Variables
+        run: echo "Initialising environment variables"
+
   build:
+    needs: initialise_vars
+    permissions:
+      id-token: write # Require write permission to Fetch an OIDC token.
+      contents: read
     uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
     with:
       test_trigger: ${{ github.event_name }}
-      template_file_path: ${{ env.template_file_path }}
-      template_file_name: ${{ env.template_file_name }}
-      parameter_file_path: ${{ env.template_file_path}}/${{ env.parameter_file_name}}
-      skip_tests: ${{ env.skip_tests }}
-      mode: ${{ env.mode }}
+      template_file_path: ${{ needs.initialise_vars.outputs.template_file_path }}
+      template_file_name: ${{ needs.initialise_vars.outputs.template_file_name }}
+      parameter_file_path: ${{ needs.initialise_vars.outputs.template_file_path}}/${{ needs.initialise_vars.outputs.parameter_file_name}}
+      skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
+      mode: ${{ needs.initialise_vars.outputs.mode }}
       continue_on_failed_tests: false
-      environment: ${{ env.environment }}
+      environment: ${{ needs.initialise_vars.outputs.environment }}
   
   
   
