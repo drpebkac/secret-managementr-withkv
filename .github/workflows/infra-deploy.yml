@@ -71,7 +71,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: eventsair/eventsair-azure-platform/.github/workflows/deploy.yml@main
+    uses: drpebkac/secret-managementr-withkv/.github/workflows/deploy.yml@main
     with:
       environment: ${{ needs.initialise_vars.outputs.environment }}
       location: ${{ needs.initialise_vars.outputs.location }}
