@@ -2,6 +2,7 @@ name: Deploy Infrastructure for Secret Management utility
 
 on:
   workflow_dispatch:
+    
 
 env:
   template_folder_path: "bicep/secret-management"
