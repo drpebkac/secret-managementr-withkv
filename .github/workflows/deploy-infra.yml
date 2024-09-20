@@ -39,7 +39,7 @@ jobs:
     secrets: inherit
     with:
       test_trigger: ${{ github.event_name }}
-      template_folder_path: "${{ needs.initialise_vars.outputs.template_folder_path }}"
+      template_folder_path: ${{ needs.initialise_vars.outputs.template_folder_path }}
       template_file_name: ${{ needs.initialise_vars.outputs.template_file_name }}
       parameter_file_path: "${{ needs.initialise_vars.outputs.template_folder_path }}/${{ needs.initialise_vars.outputs.parameter_file_name}}"
       skip_tests: ${{ needs.initialise_vars.outputs.skip_tests }}
