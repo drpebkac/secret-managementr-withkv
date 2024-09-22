@@ -55,6 +55,11 @@ jobs:
       - name: 'Checkout gitHub action'
         uses: actions/checkout@v3
 
+      - name: Prepare build directory
+        run: |
+          mkdir ${{ runner.workspace }}/deploy
+        shell: pwsh
+
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
