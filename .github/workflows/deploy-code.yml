@@ -1,0 +1,79 @@
+name: code_deploy
+
+on:
+  workflow_call:
+    inputs:
+      function_app_name:
+        description: "the name of the function app in which the code is deployed to"
+        type: string
+      function_app_rg:
+        description: "resource group in which the function app belongs to"
+        type: string
+      environment:
+        description: "environment for this deployment"
+        type: string
+
+env:
+  deployment_name: "deploy_sctmgr_code" # name of the arm deployment"
+  fa_code_path: function-apps/secrets-management 
+  build_folder: 'build'
+
+jobs:
+  build_code:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }} 
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: 'Checkout gitHub action'
+        uses: actions/checkout@v3
+
+      - name: Prepare build directory
+        run: |
+          mkdir ${{ runner.workspace }}/${{ env.build_folder }}
+          Compress-Archive -Path ${{ env.fa_code_path }} -DestinationPath ${{ runner.workspace }}/${{ env.build_folder }}/fa-code.zip 
+        shell: pwsh
+
+      - name: Upload artifact for deployment
+        env:
+          BUILDFOLDERPATH: ${{ runner.temp }}/${{ env.build_folder }}/fa-code.zip 
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: ${{ env.BUILDFOLDERPATH }}
+      
+  deploy_code:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }} 
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: 'Checkout gitHub action'
+        uses: actions/checkout@v3
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy_code
+          path: ${{ runner.workspace }}/deploy
+
+      - name: Authenticate to Azure
+        uses: azure/login@v1.4.6
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Deploy function app
+        run: |
+          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.workspace }}/deploy/fa-code.zip --verbose
+            
+      - name: 'Cleanup deploy folder'
+        run: |
+          rm -r ${{ runner.workspace }}/deploy
+      - uses: actions/checkout@v2
