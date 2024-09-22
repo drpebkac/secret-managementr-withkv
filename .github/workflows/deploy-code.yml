@@ -79,5 +79,5 @@ jobs:
             
       - name: 'Cleanup deploy folder'
         run: |
-          rm -r ${{ runner.workspace }}/deploy
+          rm -r ${{ runner.temp }}/deploy
       - uses: actions/checkout@v2
