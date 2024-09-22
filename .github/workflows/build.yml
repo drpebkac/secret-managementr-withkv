@@ -65,7 +65,7 @@ jobs:
         uses: tj-actions/changed-files@v42
         with:
           # Avoid using single or double quotes for multiline patterns
-          files: ${{ inputs.template_folder_path }}/${{ inputs.parameter_file_name }}
+          files: ${{ inputs.template_folder_path }}/**
 
       - name: List all changed files markdown files
         if: steps.changed-markdown-files.outputs.any_changed == 'true'
@@ -76,5 +76,62 @@ jobs:
             echo "$file was changed"
           done
 
+      - name: Build Bicep into ARM
+        env:
+          BUILDFOLDERPATH: ${{ runner.temp }}/${{ env.build_folder }}
+          TESTFOLDERPATH: ${{ runner.temp }}/${{ env.test_result_folder }}
+          ALL_CHANGED_FILES: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
+          ANY_CHANGED_FILES: ${{ steps.changed-markdown-files.outputs.any_changed }}
+          PARAM_FILE_PATH: "${{ inputs.template_folder_path }}/${{ inputs.parameter_file_name }}"
+        run: |
+          mkdir '${{ env.BUILDFOLDERPATH }}'
+          mkdir '${{ env.BUILDFOLDERPATH }}/param'
+          az bicep build --file ${{ inputs.template_folder_path }}/${{ inputs.template_file_name }}.bicep --outdir '${{ env.BUILDFOLDERPATH }}'
+
+          if ("${{ inputs.mode }}" -ne "operations"){
+            if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/azuredeploy.parameters.json
+              }
+            elseif ("${{ env.PARAM_FILE_PATH }}" -like "*parameters.json"){
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}'
+              }
+          }
+          #If condition for 
+          # copy parameter files to build folder if operations deployment
+          if ("${{ inputs.mode }}" -eq "operations" && "${{ env.ANY_CHANGED_FILES }}" -eq "true" ){
+            $files = "${{ env.ALL_CHANGED_FILES }}"
+            $splitFiles =$files.Split(" ")
+            write-output $splitFiles
+            foreach ($file in $splitFiles){
+                if ($file -like "*.bicepparam"){                          
+                  write-output $file
+                  bicep build-params $file --outfile $file.Replace(".bicepparam", ".parameters.json")
+                  Copy-Item -Path $file.Replace(".bicepparam", ".parameters.json") -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                    }
+                  }
+                }
+                elseif ("${{ inputs.mode }}" -eq "operations" && "${ANY_CHANGED_FILES}" -ne "true" ){
+                  $files = Get-ChildItem "${{ inputs.template_folder_path }}" | Where-Object {$_.Name -like "*.parameters.json" -or $_.Name -like "*.bicepparam"}
+                  foreach ($file in $files){
+                  if ($file.FullName -like "*.bicepparam"){
+                  bicep build-params $file.FullName --outfile $file.FullName.Replace(".bicepparam", ".parameters.json")
+                  Copy-Item -Path $file.FullName.Replace(".bicepparam", ".parameters.json") -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                }
+                else{
+                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                }
+              }
+          }
+          if ("${{ inputs.mode }}" -eq "operations" && "${{ inputs.parameter_file_name }}" -ne "" ){
+            if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
+              $paramName="${{ inputs.parameter_file_name }}"
+              $paramName=$paramName.Replace(".bicepparam", ".parameters.json")
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}/param/$paramName"
+                }
+            elseif ("${{ env.PARAM_FILE_PATH }}" -like "*.json"){
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/param'
+              }
+          }
+        shell: pwsh
       
 
