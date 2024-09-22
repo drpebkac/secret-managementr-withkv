@@ -30,11 +30,17 @@ jobs:
       - name: 'Checkout gitHub action'
         uses: actions/checkout@v3
 
+      - name: Prepare build directory
+        run: |
+          mkdir ${{ runner.temp }}/${{ env.build_folder }}
+          Compress-Archive -Path ${{ env.fa_code_path }} -DestinationPath ${{ runner.temp }}/${{ env.build_folder }}/fa-code.zip 
+        shell: pwsh
+
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: fa-code
-          path: ${{ env.fa_code_path }}
+          name: artifact
+          path: ${{ runner.temp }}/${{ env.build_folder }}
       
   deploy_code:
     runs-on: ubuntu-latest
@@ -68,8 +74,8 @@ jobs:
 
       - name: Deploy function app
         run: |
-          ls
-          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.temp }}/deploy/fa-code.zip --verbose
+          ls 
+          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.temp }}/deploy --verbose
             
       - name: 'Cleanup deploy folder'
         run: |
