@@ -160,9 +160,9 @@ jobs:
         uses: actions/checkout@v3.3.0
 
       - name: Download Artifact
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact@v4
         with:
-          name: deploy
+          name: build-artifact
           path: ${{ runner.workspace }}/deploy
 
       - name: Azure CLI Login
