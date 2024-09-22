@@ -11,6 +11,7 @@ env:
   skip_tests: "'apiVersions Should Be Recent','Template Should Not Contain Blanks','Parameter Types Should Be Consistent','Parameters Must Be Referenced','Min And Max Value Are Numbers','Location Should Not Be Hardcoded','Password params must be secure','Outputs Must Not Contain Secrets', 'URIs Should Be Properly Constructed'"
   environment: "prod"
   location: "AustraliaEast"
+  deployment_name: "deploy_secret_manager"
 
 jobs:
   initialise_vars:

@@ -174,13 +174,15 @@ jobs:
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --subscription $subId `
-            --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+              --template-file ${{ runner.workspace }}/deploy/main.json `
+              --parameters parameters.json
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant create `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-            --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+              --template-file ${{ runner.workspace }}/deploy/main.json `
+              --parameters parameters.json
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
           az deployment mg create `
