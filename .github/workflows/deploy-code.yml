@@ -34,6 +34,7 @@ jobs:
         run: |
           mkdir ${{ runner.workspace }}/${{ env.build_folder }}
           Compress-Archive -Path ${{ env.fa_code_path }} -DestinationPath ${{ runner.workspace }}/${{ env.build_folder }}/fa-code.zip 
+          ls
         shell: pwsh
 
       - name: Upload artifact for deployment
