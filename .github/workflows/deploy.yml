@@ -67,8 +67,9 @@ jobs:
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
       - name: What-If Deploy to Azure (Operations)
-        if: ${{ inputs.mode }} == 'operations'
+        if: inputs.mode == 'operations'
         run: |
+          Write-Host "Filler"
           $ErrorActionPreference = 'stop'
           $files = Get-ChildItem ${{ runner.workspace }}/deploy | Where-Object {$_.Name -like "*.json"}
           $files
