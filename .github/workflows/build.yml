@@ -85,14 +85,14 @@ jobs:
           PARAM_FILE_PATH: "${{ inputs.template_folder_path }}/${{ inputs.parameter_file_name }}"
         run: |
           mkdir '${{ env.BUILDFOLDERPATH }}'
-          az bicep build --file ${{ inputs.template_folder_path }}/${{ inputs.template_file_name }}.bicep --outdir '${{ env.BUILDFOLDERPATH }}'
+          az bicep build --file ${{ inputs.template_folder_path }}/${{ inputs.template_file_name }}.bicep --outdir '${{ env.BUILDFOLDERPATH }}/main.json'
 
           if ("${{ inputs.mode }}" -ne "operations"){
             if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
-                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/${{ inputs.template_file_name }}.parameters.json
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/parameters.json
               }
             elseif ("${{ env.PARAM_FILE_PATH }}" -like "*parameters.json"){
-                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}'
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/parameters.json'
               }
           }
           #If condition for 
@@ -104,7 +104,7 @@ jobs:
             foreach ($file in $splitFiles){
                 if ($file -like "*.bicepparam"){                          
                   write-output $file
-                  bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/$file.Replace(".bicepparam", ".parameters.json")
+                  bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/parameters.json
                     }
                   }
                 }
@@ -112,21 +112,19 @@ jobs:
                   $files = Get-ChildItem "${{ inputs.template_folder_path }}" | Where-Object {$_.Name -like "*.parameters.json" -or $_.Name -like "*.bicepparam"}
                   foreach ($file in $files){
                   if ($file.FullName -like "*.bicepparam"){
-                  bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/$file.Replace(".bicepparam", ".parameters.json")
+                  bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/parameters.json
                 }
                 else{
-                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}'
+                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}/parameters.json'
                 }
               }
           }
           if ("${{ inputs.mode }}" -eq "operations" && "${{ inputs.parameter_file_name }}" -ne "" ){
             if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
-              $paramName="${{ inputs.parameter_file_name }}"
-              $paramName=$paramName.Replace(".bicepparam", ".parameters.json")
-                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}/$paramName"
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}//parameters.json"
                 }
             elseif ("${{ env.PARAM_FILE_PATH }}" -like "*.json"){
-                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}'
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/parameters.json'
               }
           }
         shell: pwsh

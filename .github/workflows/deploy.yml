@@ -78,36 +78,36 @@ jobs:
               write-output $paramFile
             }
           }
-  #           $subId = $paramFile.parameters.subscriptionId.value
-  #           write-output $subId
-  #           az account set --subscription $subId
-  #             az deployment sub what-if `
-  #               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
-  #               --location '${{ inputs.location }}' `
-  #               --subscription $subId `
-  #               --template-file ${{ runner.workspace }}/deploy/$template --parameters $file.FullName
-  #           }
-  #           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
-  #             az deployment tenant what-if `
-  #               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
-  #               --location '${{ inputs.location }}' `
-  #               --template-file ${{ runner.workspace }}/deploy/$template --parameters $file.FullName
-  #           }
-  #           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
-  #             az deployment mg what-if `
-  #               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
-  #               --location '${{ inputs.location }}' `
-  #               --management-group-id '${{ inputs.management_group_id }}' `
-  #               --template-file ${{ runner.workspace }}/deploy/$template --parameters $file.FullName
-  #           }
-  #           if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
-  #             az account set --subscription '${{ inputs.subscription_id }}'
-  #             az deployment group what-if `
-  #               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
-  #               --resource-group '${{ inputs.resource_group_name }}' `
-  #               --template-file ${{ runner.workspace }}/deploy/$template --parameters $file.FullName
-  #           }
-  #         }
+            $subId = $paramFile.parameters.subscriptionId.value
+            write-output $subId
+            az account set --subscription ${{ secrets.SUBSCRIPTION_ID }}
+              az deployment sub what-if `
+                --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --subscription ${{ secrets.SUBSCRIPTION_ID }} `
+                --template-file ${{ runner.workspace }}/deploy/main.json --parameters ${{ runner.workspace }}/deploy/parameters.json
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
+              az deployment tenant what-if `
+                --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --template-file ${{ runner.workspace }}/deploy/main.json --parameters ${{ runner.workspace }}/deploy/parameters.json
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
+              az deployment mg what-if `
+                --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --management-group-id '${{ inputs.management_group_id }}' `
+                --template-file ${{ runner.workspace }}/deploy/main.json --parameters ${{ runner.workspace }}/deploy/parameters.json
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
+              az account set --subscription '${{ inputs.subscription_id }}'
+              az deployment group what-if `
+                --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
+                --resource-group '${{ inputs.resource_group_name }}' `
+                --template-file ${{ runner.workspace }}/deploy/main.json --parameters ${{ runner.workspace }}/deploy/parameters.json
+            }
+          }
         shell: pwsh
 
   #     - name: What-If Deploy to Azure
