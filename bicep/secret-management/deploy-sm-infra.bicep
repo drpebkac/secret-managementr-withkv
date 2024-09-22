@@ -52,6 +52,9 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
 
 // Deploys storage account for secret expiry reports to store in
 module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = {
+  dependsOn: [
+    rg
+  ]
   name: 'deploy_storage_account'
   scope: rg
   params: {
@@ -85,6 +88,9 @@ var defaultAppSettings = {
 var finalAppSettings = union(defaultAppSettings, appSettings)
 
 module logAnalytics '../modules/log-analytics/log-analytics.bicep' = {
+  dependsOn: [
+    rg
+  ]
   name: 'deploy_law'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -95,6 +101,9 @@ module logAnalytics '../modules/log-analytics/log-analytics.bicep' = {
 
 //Deploy application insights for function app
 module applicationInsights '../modules/insights/components/main.bicep' = {
+  dependsOn: [
+    rg
+  ]
   name: 'deploy_fa_applicationInsights'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -106,6 +115,9 @@ module applicationInsights '../modules/insights/components/main.bicep' = {
 }
 
 module appServicePlan '../modules/web/server-farms/main.bicep' = {
+  dependsOn: [
+    rg
+  ]
   name: 'deploy_serverFarm'
   scope: resourceGroup(resourceGroupName)
   params: {
@@ -118,6 +130,9 @@ module appServicePlan '../modules/web/server-farms/main.bicep' = {
 }
 
 module functionAppModule '../modules/web/sites/main.bicep' = {
+  dependsOn: [
+    rg
+  ]
   name: 'deploy_fa'
   scope: resourceGroup(resourceGroupName)
   params: {
