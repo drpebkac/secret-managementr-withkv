@@ -71,7 +71,7 @@ jobs:
         if: inputs.mode == 'operations'
         run: |
           $ErrorActionPreference = 'stop'
-          $files = Get-ChildItem ${{ runner.workspace }}/deploy/ | Where-Object {$_.Name -like "*.json"}
+          $files = Get-ChildItem ${{ runner.workspace }}/deploy | Where-Object {$_.Name -like "*.json"}
           $files
   #         foreach ($file in $files) {
   #           if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
