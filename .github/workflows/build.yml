@@ -132,6 +132,8 @@ jobs:
         shell: pwsh
 
       - name: Upload artifact for deployment
+        env:
+          BUILDFOLDERPATH: ${{ runner.temp }}/${{ env.build_folder }}
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
