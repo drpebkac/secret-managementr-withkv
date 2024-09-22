@@ -196,7 +196,8 @@ jobs:
             az deployment group create `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --resource-group '${{ inputs.resource_group_name }}' `
-            --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+              --template-file ${{ runner.workspace }}/deploy/main.json `
+              --parameters parameters.json
           }
         shell: pwsh
 
@@ -209,28 +210,32 @@ jobs:
             az deployment sub create `
               --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-              --subscription '${{ inputs.subscription_id }}' `
-              --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+              --subscription '${{ secrets.SUBSCRIPTION_ID }}}' `
+              --template-file ${{ runner.workspace }}/deploy/main.json `
+              --parameters parameters.json
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant create `
               --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-              --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+              --template-file ${{ runner.workspace }}/deploy/main.json `
+              --parameters parameters.json
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
           az deployment mg create `
             --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
             --location '${{ inputs.location }}' `
             --management-group-id '${{ inputs.management_group_id }}' `
-              --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+            --template-file ${{ runner.workspace }}/deploy/main.json `
+            --parameters parameters.json
           }
           if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
             az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}''
             az deployment group create `
               --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
               --resource-group '${{ inputs.resource_group_name }}' `
-              --template-file ${{ runner.workspace }}/deploy/main.json --parameters parameters.json
+              --template-file ${{ runner.workspace }}/deploy/main.json `
+              --parameters parameters.json
           }
         shell: pwsh
 
