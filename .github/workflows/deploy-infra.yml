@@ -10,6 +10,7 @@ env:
   mode: "operations"
   skip_tests: "'apiVersions Should Be Recent','Template Should Not Contain Blanks','Parameter Types Should Be Consistent','Parameters Must Be Referenced','Min And Max Value Are Numbers','Location Should Not Be Hardcoded','Password params must be secure','Outputs Must Not Contain Secrets', 'URIs Should Be Properly Constructed'"
   environment: "prod"
+  location: "AustraliaEast"
 
 jobs:
   initialise_vars:
@@ -19,9 +20,6 @@ jobs:
       template_file_name: ${{ env.template_file_name }}
       parameter_file_name: ${{ env.parameter_file_name }}
       location: ${{ env.location }}
-      subscription_id: ${{ env.subscription_id }}
-      oidc_app_reg_client_id: ${{ env.oidc_app_reg_client_id }}
-      azure_tenant_id: ${{ env.azure_tenant_id }}
       environment: ${{ env.environment }}
       deployment_name: ${{ env.deployment_name }}
       skip_tests: ${{ env.skip_tests }}
@@ -47,7 +45,20 @@ jobs:
       continue_on_failed_tests: false
       environment: ${{ needs.initialise_vars.outputs.environment }}
 
-  
+  deploy:
+    needs: [initialise_vars, build]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    permissions:
+      id-token: write
+      contents: read
+    uses: drpebkac/secret-managementr-withkv/.github/workflows/deploy.yml@main
+    secrets: inherit # wtf github workflow
+    with:
+      az_deployment_type: 'subscription'
+      environment: ${{ needs.initialise_vars.outputs.environment }}
+      location: ${{ needs.initialise_vars.outputs.location }}
+      deployment_name: ${{ needs.initialise_vars.outputs.deployment_name }}
+      mode: ${{ needs.initialise_vars.outputs.mode }}
   
   
   
