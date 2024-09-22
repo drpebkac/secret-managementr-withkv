@@ -85,14 +85,14 @@ jobs:
           PARAM_FILE_PATH: "${{ inputs.template_folder_path }}/${{ inputs.parameter_file_name }}"
         run: |
           mkdir '${{ env.BUILDFOLDERPATH }}'
-          az bicep build --file ${{ inputs.template_folder_path }}/${{ inputs.template_file_name }}.bicep --outdir ${{ env.BUILDFOLDERPATH }}/main.json
+          az bicep build --file ${{ inputs.template_folder_path }}/${{ inputs.template_file_name }}.bicep --outdir ${{ env.BUILDFOLDERPATH }}
           ls 
           if ("${{ inputs.mode }}" -ne "operations"){
             if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
-                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/parameters.json
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/${{ inputs.parameter_file_name }}.parameters.json
               }
             elseif ("${{ env.PARAM_FILE_PATH }}" -like "*parameters.json"){
-                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/parameters.json'
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/${{ inputs.parameter_file_name }}.parameters.json'
               }
           }
           #If condition for 
@@ -115,16 +115,16 @@ jobs:
                   bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/parameters.json
                 }
                 else{
-                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}/parameters.json'
+                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}/${{ inputs.parameter_file_name }}.parameters.json'
                 }
               }
           }
           if ("${{ inputs.mode }}" -eq "operations" && "${{ inputs.parameter_file_name }}" -ne "" ){
             if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
-                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}/parameters.json"
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}/${{ inputs.parameter_file_name }}.parameters.json"
                 }
             elseif ("${{ env.PARAM_FILE_PATH }}" -like "*.json"){
-                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/parameters.json'
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/${{ inputs.parameter_file_name }}.parameters.json'
               }
           }
 

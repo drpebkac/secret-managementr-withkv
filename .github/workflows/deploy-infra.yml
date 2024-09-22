@@ -60,6 +60,8 @@ jobs:
       location: ${{ needs.initialise_vars.outputs.location }}
       deployment_name: ${{ needs.initialise_vars.outputs.deployment_name }}
       mode: ${{ needs.initialise_vars.outputs.mode }}
+      template_file_name: ${{ needs.initialise_vars.outputs.template_file_name }}
+      parameter_file_name: ${{ needs.initialise_vars.outputs.parameter_file_name }}
   
   
   
