@@ -72,10 +72,11 @@ jobs:
           $ErrorActionPreference = 'stop'
           $files = Get-ChildItem ${{ runner.workspace }}/deploy | Where-Object {$_.Name -like "*.json"}
           $files
-  #         foreach ($file in $files) {
-  #           if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
-  #           $paramFile = Get-Content $file.FullName | ConvertFrom-Json
-  #           write-output $paramFile
+          foreach ($file in $files) {
+            if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
+            $paramFile = Get-Content $file.FullName | ConvertFrom-Json
+            write-output $paramFile
+          }
   #           $subId = $paramFile.parameters.subscriptionId.value
   #           write-output $subId
   #           az account set --subscription $subId
