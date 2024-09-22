@@ -1,7 +1,7 @@
 name: code_deploy
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       function_app_name:
         description: "the name of the function app in which the code is deployed to"
