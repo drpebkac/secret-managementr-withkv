@@ -244,4 +244,4 @@ jobs:
 
       - name: Clean up runner
         run: |
-          Remove-Item -Recurse -Force ${{ runner.workspace }}/deploy -verbose
+          Remove-Item -Recurse -Force ${{ runner.workspace }}/deploy
