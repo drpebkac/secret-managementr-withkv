@@ -32,8 +32,8 @@ jobs:
 
       - name: Prepare build directory
         run: |
-          mkdir ${{ runner.workspace }}/${{ env.build_folder }}
-          Compress-Archive -Path ${{ env.fa_code_path }} -DestinationPath ${{ runner.workspace }}/${{ env.build_folder }}/fa-code.zip 
+          mkdir ${{ runner.temp }}/${{ env.build_folder }}
+          Compress-Archive -Path ${{ runner.workspace }}/${{ env.fa_code_path }} -DestinationPath ${{ runner.temp }}/${{ env.build_folder }}/fa-code.zip 
           ls
         shell: pwsh
 
