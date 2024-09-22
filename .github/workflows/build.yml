@@ -85,12 +85,11 @@ jobs:
           PARAM_FILE_PATH: "${{ inputs.template_folder_path }}/${{ inputs.parameter_file_name }}"
         run: |
           mkdir '${{ env.BUILDFOLDERPATH }}'
-          mkdir '${{ env.BUILDFOLDERPATH }}/param'
           az bicep build --file ${{ inputs.template_folder_path }}/${{ inputs.template_file_name }}.bicep --outdir '${{ env.BUILDFOLDERPATH }}'
 
           if ("${{ inputs.mode }}" -ne "operations"){
             if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
-                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/azuredeploy.parameters.json
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile ${{ env.BUILDFOLDERPATH }}/${{ inputs.template_file_name }}.parameters.json
               }
             elseif ("${{ env.PARAM_FILE_PATH }}" -like "*parameters.json"){
                 Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}'
@@ -105,8 +104,7 @@ jobs:
             foreach ($file in $splitFiles){
                 if ($file -like "*.bicepparam"){                          
                   write-output $file
-                  bicep build-params $file --outfile $file.Replace(".bicepparam", ".parameters.json")
-                  Copy-Item -Path $file.Replace(".bicepparam", ".parameters.json") -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                  bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/$file.Replace(".bicepparam", ".parameters.json")
                     }
                   }
                 }
@@ -114,11 +112,10 @@ jobs:
                   $files = Get-ChildItem "${{ inputs.template_folder_path }}" | Where-Object {$_.Name -like "*.parameters.json" -or $_.Name -like "*.bicepparam"}
                   foreach ($file in $files){
                   if ($file.FullName -like "*.bicepparam"){
-                  bicep build-params $file.FullName --outfile $file.FullName.Replace(".bicepparam", ".parameters.json")
-                  Copy-Item -Path $file.FullName.Replace(".bicepparam", ".parameters.json") -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                  bicep build-params $file --outfile ${{ env.BUILDFOLDERPATH }}/$file.Replace(".bicepparam", ".parameters.json")
                 }
                 else{
-                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                  Copy-Item -Path $file.FullName -Destination '${{ env.BUILDFOLDERPATH }}'
                 }
               }
           }
@@ -126,12 +123,17 @@ jobs:
             if ("${{ env.PARAM_FILE_PATH }}" -like "*.bicepparam"){
               $paramName="${{ inputs.parameter_file_name }}"
               $paramName=$paramName.Replace(".bicepparam", ".parameters.json")
-                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}/param/$paramName"
+                bicep build-params "${{ env.PARAM_FILE_PATH }}" --outfile "${{ env.BUILDFOLDERPATH }}/$paramName"
                 }
             elseif ("${{ env.PARAM_FILE_PATH }}" -like "*.json"){
-                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}/param'
+                Copy-Item -Path "${{ env.PARAM_FILE_PATH }}" -Destination '${{ env.BUILDFOLDERPATH }}'
               }
           }
         shell: pwsh
-      
 
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: ${{ env.BUILDFOLDERPATH }}
+      
