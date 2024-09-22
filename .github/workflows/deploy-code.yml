@@ -63,7 +63,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: deploy_code
+          name: build-artifact
           path: ${{ runner.workspace }}/deploy
 
       - name: Authenticate to Azure
