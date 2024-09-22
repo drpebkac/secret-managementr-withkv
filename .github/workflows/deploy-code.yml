@@ -61,7 +61,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: fa-code
+          name: artifact
           path: ${{ runner.temp }}/deploy
 
       - name: Authenticate to Azure
