@@ -49,14 +49,14 @@ jobs:
 
       - name: Prepare build directory
         run: |
-          mkdir ${{ runner.workspace }}/deploy
+          mkdir ${{ runner.temp }}/deploy
         shell: pwsh
 
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: fa-code
-          path: ${{ runner.workspace }}/deploy
+          path: ${{ runner.temp }}/deploy
 
       - name: Authenticate to Azure
         uses: azure/login@v1.4.6
@@ -68,7 +68,8 @@ jobs:
 
       - name: Deploy function app
         run: |
-          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.workspace }}/deploy/fa-code.zip --verbose
+          ls
+          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.temp }}/deploy/fa-code.zip --verbose
             
       - name: 'Cleanup deploy folder'
         run: |
