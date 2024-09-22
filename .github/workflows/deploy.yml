@@ -74,8 +74,9 @@ jobs:
           $files
           foreach ($file in $files) {
             if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
-            $paramFile = Get-Content $file.FullName | ConvertFrom-Json
-            write-output $paramFile
+              $paramFile = Get-Content $file.FullName | ConvertFrom-Json
+              write-output $paramFile
+            }
           }
   #           $subId = $paramFile.parameters.subscriptionId.value
   #           write-output $subId
