@@ -74,8 +74,8 @@ jobs:
 
       - name: Deploy function app
         run: |
-          ls 
-          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.temp }}/deploy --verbose
+          ls ${{ runner.temp }}/deploy
+          az functionapp deployment source config-zip -g ${{ inputs.function_app_rg }} -n ${{ inputs.function_app_name }} --src ${{ runner.temp }}/deploy/fa-code.zip --verbose
             
       - name: 'Cleanup deploy folder'
         run: |
