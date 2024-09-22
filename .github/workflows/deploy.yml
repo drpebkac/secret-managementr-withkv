@@ -69,7 +69,6 @@ jobs:
       - name: What-If Deploy to Azure (Operations)
         if: inputs.mode == 'operations'
         run: |
-          Write-Host "Filler"
           $ErrorActionPreference = 'stop'
           $files = Get-ChildItem ${{ runner.workspace }}/deploy | Where-Object {$_.Name -like "*.json"}
           $files
@@ -107,7 +106,7 @@ jobs:
   #               --template-file ${{ runner.workspace }}/deploy/$template --parameters $file.FullName
   #           }
   #         }
-  #       shell: pwsh
+        shell: pwsh
 
   #     - name: What-If Deploy to Azure
   #       if: inputs.mode == 'deploy'
