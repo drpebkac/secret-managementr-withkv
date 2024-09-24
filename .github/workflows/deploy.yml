@@ -241,7 +241,3 @@ jobs:
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
           }
         shell: pwsh
-
-      - name: Clean up runner
-        run: |
-          Remove-Item -Recurse -Force ${{ runner.workspace }}/deploy
