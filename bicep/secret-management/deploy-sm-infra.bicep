@@ -139,7 +139,7 @@ module containerModule '../modules/storage/blob/main.bicep' = if (!empty(contain
   name: 'container_deploy'
   scope: rg
   dependsOn: [
-    storageAccountModule
+    storageAccountModule[1]
   ]
   params: {
     containers: containers
