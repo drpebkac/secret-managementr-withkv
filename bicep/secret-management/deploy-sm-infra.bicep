@@ -125,9 +125,6 @@ module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in r
 
 // Deploys storage account
 module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = [ for i in range(0, (length(storageAccountArray))) : {
-  dependsOn: [
-    rg
-  ]
   name: 'deploy_storage_account-${i}'
   scope: rg
   params: {
