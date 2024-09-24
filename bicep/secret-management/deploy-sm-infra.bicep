@@ -62,11 +62,11 @@ var placeholderSecrets = [
   }
   {
     name: 'msTeamsWebhookUri'
-    value: 'Replace this value with a MS Teams webhook uri' // Do not replace values here on this variable. The  value is a literal secret intended to be changed on the key vault itself.
+    value: 'Replace this value with a MS Teams webhook uri' // Do not replace values here on this variable. The value is a literal secret intended to be changed on the key vault itself.
   }
   {
-    name: 'msTeamsWebhookUri_Secondary'
-    value: 'Replace this value with a MS Teams webhook uri' // Do not replace values here on this variable. The  value is a literal secret intended to be changed on the key vault itself.
+    name: 'msTeamsWebhookUriSecondary'
+    value: 'Replace this value with a MS Teams webhook uri' // Do not replace values here on this variable. The value is a literal secret intended to be changed on the key vault itself.
   }
 ]
 
