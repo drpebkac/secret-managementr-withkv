@@ -76,19 +76,12 @@ var defaultAppSettings = {
   WEBSITE_TIME_ZONE: 'AUS Eastern Standard Time'
   SM_TENANT_NAME: tenant().displayName
   SM_TENANT_ID: tenant().tenantId
-}
-
-// Define this variable If using third party tools (Eg, Sendgrid) 
-var integrationSettings = ( appSettings.SM_NOTIFY_EMAIL_WITH_SENDGRID == 'true' ) ? {
   SM_SENDGRID_TOKEN: '@Microsoft.KeyVault(VaultName=${kv.outputs.name};SecretName=${placeholderSecrets[0].name})'
-} : {}
-
-var msTeamsWebhookSettings = ( appSettings.SM_NOTIFY_MSTEAMS_WEBHOOK == 'true' ) ? {
   SM_MSTEAMS_WEBHOOK_URI: '@Microsoft.KeyVault(VaultName=${kv.outputs.name};SecretName=${placeholderSecrets[1].name})'
   SM_MSTEAMS_WEBHOOK_URI_SECONDARY: '@Microsoft.KeyVault(VaultName=${kv.outputs.name};SecretName=${placeholderSecrets[2].name})'
-} : {}
+}
 
-var finalAppSettings = union(defaultAppSettings, appSettings, integrationSettings, msTeamsWebhookSettings)
+var finalAppSettings = union(defaultAppSettings, appSettings)
 
 // This will create a resource group if it doesnt exist. This will be the primary resource group for resources to deploy into
 resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
