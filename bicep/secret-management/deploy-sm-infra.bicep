@@ -113,6 +113,9 @@ module kv '../modules/key-vault/vaults/main.bicep' = {
 module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets)): {
   name: 'create_kv_secret-${i}'
   scope: rg
+  dependsOn: [
+    kv
+  ]
   params: {
     keyVaultName: kv.outputs.name
     name: placeholderSecrets[i].name
