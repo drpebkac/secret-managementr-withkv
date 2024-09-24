@@ -7,4 +7,5 @@
 	'Az.Accounts' = '2.12.0'
 	'Az.Keyvault' = '4.9.1'
 	'Az.Resources' = '6.6.0'
+	'PSSendGrid' = '0.4.1'
 }

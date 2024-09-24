@@ -1,0 +1,378 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.20.4.51522",
+      "templateHash": "14493796345547834047"
+    },
+    "name": "Key Vaults Module",
+    "description": "This module deploys Microsoft.KeyVault vaults",
+    "owner": "Arinco"
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource name."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "The geo-location where the resource lives."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "doc": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources?tabs=bicep#arm-templates",
+        "example": {
+          "tagKey": "string"
+        },
+        "description": "Optional. Resource tags."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "standard",
+      "allowedValues": [
+        "standard",
+        "premium"
+      ],
+      "metadata": {
+        "description": "Optional. The sku of the key vault."
+      }
+    },
+    "enabledForDeployment": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Optional. Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
+      }
+    },
+    "enabledForDiskEncryption": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Optional. Property to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys."
+      }
+    },
+    "enabledForTemplateDeployment": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Optional. Property to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault."
+      }
+    },
+    "enablePurgeProtection": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Optional. Property specifying whether protection against purge is enabled for this vault."
+      }
+    },
+    "softDeleteRetentionInDays": {
+      "type": "int",
+      "defaultValue": 90,
+      "metadata": {
+        "description": "Optional. SoftDelete data retention days. It accepts >=7 and <=90."
+      }
+    },
+    "enableRbacAuthorization": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Optional. Property that controls how data actions are authorized. When true, the key vault will use Role Based Access Control (RBAC) for authorization of data actions, and the access policies specified in vault properties will be ignored."
+      }
+    },
+    "accessPolicies": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "applicationId": "Application ID of the client making request on behalf of a principal.",
+        "objectId": "The object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies.",
+        "permissions": {
+          "certificates": [
+            "String array containing any of:",
+            "all",
+            "backup",
+            "create",
+            "delete",
+            "deleteissuers",
+            "get",
+            "getissuers",
+            "import",
+            "list",
+            "listissuers",
+            "managecontacts",
+            "manageissuers",
+            "purge",
+            "recover",
+            "restore",
+            "setissuers",
+            "update"
+          ],
+          "keys": [
+            "String array containing any of:",
+            "all",
+            "backup",
+            "create",
+            "decrypt",
+            "delete",
+            "encrypt",
+            "get",
+            "getrotationpolicy",
+            "import",
+            "list",
+            "purge",
+            "recover",
+            "release",
+            "restore",
+            "rotate",
+            "setrotationpolicy",
+            "sign",
+            "unwrapKey",
+            "update",
+            "verify",
+            "wrapKey"
+          ],
+          "secrets": [
+            "String array containing any of:",
+            "all",
+            "backup",
+            "delete",
+            "get",
+            "list",
+            "purge",
+            "recover",
+            "restore",
+            "set"
+          ],
+          "storage": [
+            "String array containing any of:",
+            "all",
+            "backup",
+            "delete",
+            "deletesas",
+            "get",
+            "getsas",
+            "list",
+            "listsas",
+            "purge",
+            "recover",
+            "regeneratekey",
+            "restore",
+            "set",
+            "setsas",
+            "update"
+          ]
+        },
+        "tenantId": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.",
+        "description": "Optional. An array of 0 to 1024 identities that have access to the key vault. Only required when enableRbacAuthorization is set to \"false\"."
+      }
+    },
+    "networkAcls": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "bypass": "Tells what traffic can bypass network rules. This can be \"AzureServices\" or \"None\". If not specified the default is \"AzureServices\".",
+        "defaultAction": "The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated. Accepted values are \"Allow\" or \"Deny\".",
+        "ipRules": [
+          {
+            "value": "An IPv4 address range in CIDR notation, such as \"124.56.78.91\" (simple IP address) or \"124.56.78.0/24\" (all addresses that start with 124.56.78)."
+          }
+        ],
+        "virtualNetworkRules": [
+          {
+            "id": "Full resource id of a vnet subnet.",
+            "ignoreMissingVnetServiceEndpoint": "Property to specify whether NRP will ignore the check if parent subnet has serviceEndpoints configured. Accepted values are \"true\" or \"false\"."
+          }
+        ],
+        "description": "Optional. Rules governing the accessibility of the key vault from specific network locations."
+      }
+    },
+    "resourceLock": {
+      "type": "string",
+      "defaultValue": "NotSpecified",
+      "allowedValues": [
+        "NotSpecified",
+        "ReadOnly",
+        "CanNotDelete"
+      ],
+      "metadata": {
+        "description": "Optional. Specify the type of resource lock."
+      }
+    },
+    "enableDiagnostics": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Enable diagnostic logging."
+      }
+    },
+    "diagnosticLogCategoryGroupsToEnable": {
+      "type": "array",
+      "defaultValue": [
+        "audit"
+      ],
+      "allowedValues": [
+        "audit",
+        "allLogs"
+      ],
+      "metadata": {
+        "description": "Optional. The name of log category groups that will be streamed."
+      }
+    },
+    "diagnosticMetricsToEnable": {
+      "type": "array",
+      "defaultValue": [
+        "AllMetrics"
+      ],
+      "allowedValues": [
+        "AllMetrics"
+      ],
+      "metadata": {
+        "description": "Optional. The name of metrics that will be streamed."
+      }
+    },
+    "diagnosticStorageAccountId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Storage account resource id. Only required if enableDiagnostics is set to true."
+      }
+    },
+    "diagnosticLogAnalyticsWorkspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Log analytics workspace resource id. Only required if enableDiagnostics is set to true."
+      }
+    },
+    "diagnosticEventHubAuthorizationRuleId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Event hub authorization rule for the Event Hubs namespace. Only required if enableDiagnostics is set to true."
+      }
+    },
+    "diagnosticEventHubName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. Event hub name. Only required if enableDiagnostics is set to true."
+      }
+    }
+  },
+  "variables": {
+    "copy": [
+      {
+        "name": "diagnosticsLogs",
+        "count": "[length(parameters('diagnosticLogCategoryGroupsToEnable'))]",
+        "input": {
+          "categoryGroup": "[parameters('diagnosticLogCategoryGroupsToEnable')[copyIndex('diagnosticsLogs')]]",
+          "enabled": true
+        }
+      },
+      {
+        "name": "diagnosticsMetrics",
+        "count": "[length(parameters('diagnosticMetricsToEnable'))]",
+        "input": {
+          "category": "[parameters('diagnosticMetricsToEnable')[copyIndex('diagnosticsMetrics')]]",
+          "timeGrain": null,
+          "enabled": true
+        }
+      }
+    ],
+    "lockName": "[toLower(format('{0}-{1}-lck', parameters('name'), parameters('resourceLock')))]",
+    "diagnosticsName": "[toLower(format('{0}-dgs', parameters('name')))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-02-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "[parameters('sku')]"
+        },
+        "enabledForDeployment": "[parameters('enabledForDeployment')]",
+        "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
+        "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": "[parameters('softDeleteRetentionInDays')]",
+        "enablePurgeProtection": "[if(parameters('enablePurgeProtection'), true(), null())]",
+        "enableRbacAuthorization": "[parameters('enableRbacAuthorization')]",
+        "networkAcls": {
+          "bypass": "[if(contains(parameters('networkAcls'), 'bypass'), parameters('networkAcls').bypass, null())]",
+          "defaultAction": "[if(contains(parameters('networkAcls'), 'defaultAction'), parameters('networkAcls').defaultAction, null())]",
+          "ipRules": "[if(contains(parameters('networkAcls'), 'ipRules'), parameters('networkAcls').ipRules, null())]",
+          "virtualNetworkRules": "[if(contains(parameters('networkAcls'), 'virtualNetworkRules'), parameters('networkAcls').virtualNetworkRules, null())]"
+        },
+        "accessPolicies": "[parameters('accessPolicies')]"
+      }
+    },
+    {
+      "condition": "[not(equals(parameters('resourceLock'), 'NotSpecified'))]",
+      "type": "Microsoft.Authorization/locks",
+      "apiVersion": "2017-04-01",
+      "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('name'))]",
+      "name": "[variables('lockName')]",
+      "properties": {
+        "level": "[parameters('resourceLock')]",
+        "notes": "[if(equals(parameters('resourceLock'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot modify the resource or child resources.')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('name'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('enableDiagnostics')]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('name'))]",
+      "name": "[variables('diagnosticsName')]",
+      "properties": {
+        "workspaceId": "[if(empty(parameters('diagnosticLogAnalyticsWorkspaceId')), null(), parameters('diagnosticLogAnalyticsWorkspaceId'))]",
+        "storageAccountId": "[if(empty(parameters('diagnosticStorageAccountId')), null(), parameters('diagnosticStorageAccountId'))]",
+        "eventHubAuthorizationRuleId": "[if(empty(parameters('diagnosticEventHubAuthorizationRuleId')), null(), parameters('diagnosticEventHubAuthorizationRuleId'))]",
+        "eventHubName": "[if(empty(parameters('diagnosticEventHubName')), null(), parameters('diagnosticEventHubName'))]",
+        "logs": "[variables('diagnosticsLogs')]",
+        "metrics": "[variables('diagnosticsMetrics')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('name'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the deployed key vault."
+      },
+      "value": "[parameters('name')]"
+    },
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the deployed key vault."
+      },
+      "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('name'))]"
+    },
+    "uri": {
+      "type": "string",
+      "metadata": {
+        "description": "The uri of the deployed key vault."
+      },
+      "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('name')), '2023-02-01').vaultUri]"
+    }
+  }
+}

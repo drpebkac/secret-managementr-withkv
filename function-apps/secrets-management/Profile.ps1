@@ -1,6 +1,7 @@
 Import-Module Az.Accounts
 Import-Module Az.Keyvault
 Import-Module Az.Resources
+Import-Module PSSendGrid
 
 # Azure Functions profile.ps1
 #

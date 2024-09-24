@@ -3,6 +3,72 @@ using namespace System.Net
 # Input bindings are passed in via param block.
 param($Timer)
 
+function PostWebhookNotification($OutputTableCerts,$OutputTableSecrets)
+{
+  $RootOrgName = $env:SM_CLIENT_NAME
+  $MSTeamsUri = $env:SM_MSTEAMS_WEBHOOK_URI
+  $MSTeamsUriSecondary = $env:SM_MSTEAMS_WEBHOOK_URI_SECONDARY
+  $MSTeamsWebhookUriArray = @($MSTeamsUri,$MSTeamsUriSecondary)
+  $UnionedOutputTable = @($OutputTableCerts,$OutputTableSecrets)
+  
+  if($MSTeamsWebhookUriArray)
+  {
+    foreach($Uri in $MSTeamsWebhookUriArray)
+    {
+      if([string]::IsNullOrEmpty($Uri))
+      {
+        continue
+      }
+
+      foreach($Array in $UnionedOutputTable)
+      {
+        $Sections = @()
+
+        foreach($Entry in $Array)
+        {
+          $Facts = @()
+          
+          foreach($Key in $entry.Keys)
+          {
+            $Fact = @{
+              name = $Key
+              value = $Entry[$Key]
+            }
+      
+            $Facts += $Fact
+      
+          }
+      
+          $Section = @{
+            facts = $Facts
+          }
+            
+          $Sections += @($Section)
+            
+          $MSTeamsBody = @{
+            Title = "$RootOrgName - Expiring Secrets for Key Vault Secrets/Certificates"
+            Text = "This is a MS Teams notification to advise that there are expiring secrets for Key Vault objects."
+            Sections = $Sections
+          } | ConvertTo-Json -Depth 20
+
+          $PostToTeams = Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
+
+          if($($PostToTeams).Content -like "Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 500 with ContextId*")
+          {
+            $MSTeamsBody = @{
+              Title = "$RootOrgName - Expiring Secrets for Secrets/Certificates"
+              Text = "This customer has exceeded the number of expiring secrets for a Microsoft Teams webhook to handle. Please refer the customer's full csv report for details."
+              Sections = ""
+            } | ConvertTo-Json -Depth 20
+
+            Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
+          }
+        }
+      }
+    }
+  }
+}
+
 function Initialize-KVError($KVName, $SubscriptionName, $RG, $ErrorOutputAsString, $AssetType) {
   $ErrorDetails = [PSCustomObject]@{
     Subscription  = $SubscriptionName
@@ -230,7 +296,18 @@ if ($ErrorCount -gt 0) {
   $attachments += @{"Name" = $keyVaultErrorLogFileName; "Content" = $OutputToBlobErrorLogs; "ContentType" = "text/csv" }
 }
 
-if (($env:SM_NOTIFY_EMAIL_ENABLED -eq "Enabled") -and (($SecretExpiryCount -gt 0 -or $CertExpiryCount -gt 0) -or $ErrorCount -gt 0)) {
+if($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True" -and (($SecretExpiryCount -gt 0 -or $CertExpiryCount -gt 0) -or $ErrorCount -gt 0)){
+  Send-PSSendGridMail `
+    -FromAddress $env:SM_NOTIFY_EMAIL_FROM_ADDRESS `
+    -ToAddress $env:SM_NOTIFY_EMAIL_TO_ADDRESS `
+    -Subject $env:SM_KEY_VAULT_REPORT_MAIL_SUBJECT `
+    -Body $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
+    -AttachmentPath "$keyVaultSecretReportFileName", ".\$keyVaultCertReportFileName" `
+    -Token $env:SM_SENDGRID_TOKEN
+
+}
+
+if (($env:SM_NOTIFY_EMAIL_WITH_GRAPH -eq "True") -and (($SecretExpiryCount -gt 0 -or $CertExpiryCount -gt 0) -or $ErrorCount -gt 0)) {
   Import-Module EmailModule
 
   Send-Email `
@@ -239,6 +316,10 @@ if (($env:SM_NOTIFY_EMAIL_ENABLED -eq "Enabled") -and (($SecretExpiryCount -gt 0
     -MailSubject $env:SM_KEY_VAULT_REPORT_MAIL_SUBJECT `
     -MailMessage $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
     -Attachments $attachments
+}
+
+if($env:SM_NOTIFY_MSTEAMS_WEBHOOK -eq "True"){
+  PostWebhookNotification $OutputTableCerts $OutputTableSecrets
 }
 
 if ($SecretExpiryCount -gt 0) {

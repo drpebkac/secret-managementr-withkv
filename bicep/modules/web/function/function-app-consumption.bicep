@@ -89,10 +89,6 @@ var baseAppSettings = [
     value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${listKeys(storageAccountId, '2019-06-01').keys[0].value}'
   }
   {
-    name: 'AzureWebJobsStorage'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${listKeys(storageAccountId, '2019-06-01').keys[0].value}'
-  }
-  {
     name: 'FUNCTIONS_WORKER_RUNTIME'
     value: functionRuntime
   }

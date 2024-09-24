@@ -8,6 +8,69 @@ $CurrentDate = Get-Date -AsUTC
 $ExpiredStatus = "Expired"
 $NearExpiryStatus = "Near Expiry"
 
+function PostWebhookNotification($SortedExpiringSecrets)
+{
+  $RootOrgName = $env:SM_CLIENT_NAME
+  $MSTeamsUri = $env:SM_MSTEAMS_WEBHOOK_URI
+  $MSTeamsUriSecondary = $env:SM_MSTEAMS_WEBHOOK_URI_SECONDARY
+
+  $MSTeamsWebhookUriArray = @($MSTeamsUri,$MSTeamsUriSecondary)
+  
+  if($MSTeamsWebhookUriArray)
+  {
+    foreach($Uri in $MSTeamsWebhookUriArray)
+    {
+      $Sections = @()
+
+      if([string]::IsNullOrEmpty($Uri))
+      {
+        continue
+      }
+
+      foreach($Entry in $SortedExpiringSecrets)
+      {
+        $Facts = @()
+        
+        foreach($Key in $entry.Keys)
+        {
+          $Fact = @{
+            name = $Key
+            value = $Entry[$Key]
+          }
+    
+          $Facts += $Fact
+    
+        }
+    
+        $Section = @{
+          facts = $Facts
+        }
+          
+        $Sections += @($Section)
+      }
+      
+      $MSTeamsBody = @{
+        Title = "$RootOrgName - Expiring Secrets for App registrations"
+        Text = "This is a MS Teams notification to advise that there are expiring secrets for App Registrations."
+        Sections = $Sections
+      } | ConvertTo-Json -Depth 20
+
+      $PostToTeams = Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
+
+      if($($PostToTeams).Content -like "Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 500 with ContextId*")
+      {
+        $MSTeamsBody = @{
+          Title = "$RootOrgName - Expiring Secrets for App registrations"
+          Text = "This customer has exceeded the number of expiring secrets for a Microsoft Teams webhook to handle. Please refer the customer's full csv report for details."
+          Sections = ""
+        } | ConvertTo-Json -Depth 20
+
+        Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
+      }
+    }
+  }
+}
+
 function AppendExpiryReport(
   $TenantName,
   $AppId,
@@ -173,7 +236,7 @@ if ($ExpiryCount -gt 0) {
 
   Push-OutputBinding -Name storeExpiryAppRegReport -Value $OutputToBlobExpiryReport
 
-  if ($env:SM_NOTIFY_EMAIL_ENABLED -eq "Enabled") {
+  if ($env:SM_NOTIFY_EMAIL_WITH_GRAPH -eq "True") {
     Write-Host "Sending Email With Report"
 
     Import-Module EmailModule
@@ -184,9 +247,26 @@ if ($ExpiryCount -gt 0) {
       -MailSubject $env:SM_APP_REG_REPORT_MAIL_SUBJECT `
       -MailMessage $env:SM_APP_REG_REPORT_MAIL_MESSAGE `
       -Attachments @(
-      @{"Name" = $appRegSecretReportFileName; "Content" = $OutputToBlobExpiryReport; "ContentType" = "text/csv" }
-    )
+        @{
+          "Name" = $appRegSecretReportFileName; "Content" = $OutputToBlobExpiryReport; "ContentType" = "text/csv" 
+        }
+      )
+  }
+
+  if($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True"){
+    Send-PSSendGridMail `
+      -FromAddress $env:SM_NOTIFY_EMAIL_FROM_ADDRESS `
+      -ToAddress $env:SM_NOTIFY_EMAIL_TO_ADDRESS `
+      -Subject $env:SM_KEY_VAULT_REPORT_MAIL_SUBJECT `
+      -Body $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
+      -AttachmentPath ".\$appRegSecretReportFileName" `
+      -Token $env:SM_SENDGRID_TOKEN
+  }
+
+  if($env:SM_NOTIFY_MSTEAMS_WEBHOOK -eq "True"){
+    PostWebhookNotification $SortedExpiringSecrets
   }
 
   Remove-Item .\$appRegSecretReportFileName
+
 }
