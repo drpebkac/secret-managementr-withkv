@@ -110,7 +110,7 @@ module kv '../modules/key-vault/vaults/main.bicep' = {
 }
 
 // Replace value with sendgrid API value post deployment
-module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets) - 1): {
+module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets)): {
   name: 'create_kv_secret-${i}'
   scope: rg
   params: {
@@ -121,7 +121,7 @@ module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in r
 }]
 
 // Deploys storage account
-module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = [ for i in range(0, (length(storageAccountArray) - 1)) : {
+module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = [ for i in range(0, (length(storageAccountArray))) : {
   dependsOn: [
     rg
   ]
@@ -221,7 +221,7 @@ var roleDefinitionId = [
 ]
 
 //Grants function RBAC permissions to KV
-module rbacAssignments '../modules/authorization/role-assignments/main.bicep' = [ for i in range(0, length(roleDefinitionId) - 1): {
+module rbacAssignments '../modules/authorization/role-assignments/main.bicep' = [ for i in range(0, length(roleDefinitionId)): {
   name: 'deploy_RbacPermissions-${i}'
   scope: resourceGroup(resourceGroupName)
   params: {
