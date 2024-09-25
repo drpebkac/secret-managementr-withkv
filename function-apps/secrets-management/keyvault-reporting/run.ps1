@@ -245,7 +245,7 @@ foreach ($Sub in $Subs) {
           $OutputTableErrors += Initialize-KVError $KVName $SubscriptionName $RG $AccessTestResult[1] "Cert"
         }
         else {
-          $OutputTableSecrets += Get-Expiry-Cert $KVName $SubscriptionName $RG
+          $OutputTableCerts += Get-Expiry-Cert $KVName $SubscriptionName $RG
         }
       }
     }
