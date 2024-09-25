@@ -258,7 +258,7 @@ if ($ExpiryCount -gt 0) {
       -FromAddress $env:SM_NOTIFY_EMAIL_FROM_ADDRESS `
       -ToAddress $env:SM_NOTIFY_EMAIL_TO_ADDRESS `
       -Subject $env:SM_KEY_VAULT_REPORT_MAIL_SUBJECT `
-      -Body $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
+      -BodyAsHTML $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
       -AttachmentPath ".\$appRegSecretReportFileName" `
       -Token $env:SM_SENDGRID_TOKEN
   }
