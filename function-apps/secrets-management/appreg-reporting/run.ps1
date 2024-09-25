@@ -8,14 +8,14 @@ $CurrentDate = Get-Date -AsUTC
 $ExpiredStatus = "Expired"
 $NearExpiryStatus = "Near Expiry"
 
-function PostWebhookNotification($SortedExpiringSecrets)
+function PostWebhookNotification($OutputExpiration)
 {
   $RootOrgName = $env:SM_CLIENT_NAME
   $MSTeamsUri = $env:SM_MSTEAMS_WEBHOOK_URI
   $MSTeamsUriSecondary = $env:SM_MSTEAMS_WEBHOOK_URI_SECONDARY
 
   $MSTeamsWebhookUriArray = @($MSTeamsUri,$MSTeamsUriSecondary)
-  
+
   if($MSTeamsWebhookUriArray)
   {
     foreach($Uri in $MSTeamsWebhookUriArray)
@@ -27,7 +27,7 @@ function PostWebhookNotification($SortedExpiringSecrets)
         continue
       }
 
-      foreach($Entry in $SortedExpiringSecrets)
+      foreach($Entry in $OutputExpiration)
       {
         $Facts = @()
         
@@ -264,7 +264,7 @@ if ($ExpiryCount -gt 0) {
   }
 
   if($env:SM_NOTIFY_MSTEAMS_WEBHOOK -eq "True"){
-    PostWebhookNotification $SortedExpiringSecrets
+    PostWebhookNotification $OutputExpiration
   }
 
   Remove-Item .\$appRegSecretReportFileName
