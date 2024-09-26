@@ -88,14 +88,14 @@ jobs:
               --location '${{ inputs.location }}' `
               --subscription ${{ secrets.SUBSCRIPTION_ID }} `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
             az deployment mg what-if `
@@ -103,7 +103,7 @@ jobs:
               --location '${{ inputs.location }}' `
               --management-group-id '${{ inputs.management_group_id }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
             az account set --subscription '${{ inputs.subscription_id }}'
@@ -111,7 +111,7 @@ jobs:
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --resource-group '${{ inputs.resource_group_name }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
             }
         shell: pwsh
 
@@ -127,14 +127,14 @@ jobs:
               --location '${{ inputs.location }}' `
               --subscription '${{ secrets.SUBSCRIPTION_ID }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
             az deployment mg what-if `
@@ -142,7 +142,7 @@ jobs:
               --location '${{ inputs.location }}' `
               --management-group-id '${{ inputs.management_group_id }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
             if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
               az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}'
@@ -150,7 +150,7 @@ jobs:
                 --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
                 --resource-group '${{ inputs.resource_group_name }}' `
                 --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
             }
         shell: pwsh
 
@@ -192,14 +192,14 @@ jobs:
               --location '${{ inputs.location }}' `
               --subscription $subId `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant create `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
           az deployment mg create `
@@ -207,7 +207,7 @@ jobs:
             --location '${{ inputs.location }}' `
             --management-group-id '${{ inputs.management_group_id }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
           if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
             az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}'
@@ -215,7 +215,7 @@ jobs:
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --resource-group '${{ inputs.resource_group_name }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
           }
         shell: pwsh
 
@@ -231,21 +231,21 @@ jobs:
                 --location '${{ inputs.location }}' `
                 --subscription '${{ secrets.SUBSCRIPTION_ID }}}' `
                 --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
             }
             if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
               az deployment tenant create `
                 --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
                 --location '${{ inputs.location }}' `
                 --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
             }
             if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
             az deployment mg create `
               --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
             }
             if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
               az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}''
@@ -253,7 +253,7 @@ jobs:
                 --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
                 --resource-group '${{ inputs.resource_group_name }}' `
                 --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
-                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}}
             }
           }
           else{
