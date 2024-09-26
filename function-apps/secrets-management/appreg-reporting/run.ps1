@@ -12,9 +12,8 @@ function PostWebhookNotification($OutputExpiration)
 {
   $RootOrgName = $env:SM_CLIENT_NAME
   $MSTeamsUri = $env:SM_MSTEAMS_WEBHOOK_URI
-  $MSTeamsUriSecondary = $env:SM_MSTEAMS_WEBHOOK_URI_SECONDARY
 
-  $MSTeamsWebhookUriArray = @($MSTeamsUri,$MSTeamsUriSecondary)
+  $MSTeamsWebhookUriArray = @($MSTeamsUri)
 
   if($MSTeamsWebhookUriArray)
   {
@@ -208,7 +207,7 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
 
         }
 
-        $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $App.Description $App.SecretExpiryDate $ExpiredStatus
+        $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $App.Description $CredType $App.SecretExpiryDate $ExpiredStatus
 
       }
       elseif (($CurrentDate -le $DateToExpiry) -and ($CurrentDate -ge $DateToTrigger)) {
@@ -262,13 +261,13 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
 
           }
 
-          $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $($App).Description[$i] $DateToExpiry "$ExpiredStatus$RenewedStatus"
+          $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $($App).Description[$i] $CredType $DateToExpiry "$ExpiredStatus$RenewedStatus"
 
         }
         elseif (($CurrentDate -le $DateToExpiry) -and ($CurrentDate -ge $DateToTrigger)) {
           Write-Host "App $($App.DisplayName) secret is within near expiry period"
 
-          $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $($App).Description[$i] $DateToExpiry "$NearExpiryStatus$RenewedStatus"
+          $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $($App).Description[$i] $CredType $DateToExpiry "$NearExpiryStatus$RenewedStatus"
         }
 
         $i++
@@ -318,7 +317,7 @@ if ($ExpiryCount -gt 0) {
 
   Push-OutputBinding -Name storeExpiryAppRegReport -Value $OutputToBlobExpiryReport
 
-  if ($env:SM_NOTIFY_EMAIL_WITH_GRAPH -eq "True") {
+  if ($env:SM_NOTIFY_EMAIL_WITH_GRAPH -eq "True" -and ($ExpiryCount -gt 0)) {
     Write-Host "Sending Email With Report"
 
     Import-Module EmailModule
@@ -335,12 +334,12 @@ if ($ExpiryCount -gt 0) {
       )
   }
 
-  if($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True"){
+  if(($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True") -and ($ExpiryCount -gt 0)){
     Send-PSSendGridMail `
       -FromAddress $env:SM_NOTIFY_EMAIL_FROM_ADDRESS `
       -ToAddress $env:SM_NOTIFY_EMAIL_TO_ADDRESS `
-      -Subject $env:SM_KEY_VAULT_REPORT_MAIL_SUBJECT `
-      -BodyAsHTML $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
+      -Subject $env:SM_APP_REG_REPORT_MAIL_SUBJECT `
+      -BodyAsHTML $env:SM_APP_REG_REPORT_MAIL_MESSAGE `
       -AttachmentPath ".\$appRegSecretReportFileName" `
       -Token $env:SM_SENDGRID_TOKEN
   }

@@ -310,7 +310,9 @@ if ($ErrorCount -gt 0) {
 
   $attachments += @{"Name" = $keyVaultErrorLogFileName; "Content" = $OutputToBlobErrorLogs; "ContentType" = "text/csv" }
   $sendGridAttachments += ".\$keyVaultErrorLogFileName"
+
 }
+
 
 if($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True" -and (($SecretExpiryCount -gt 0 -or $CertExpiryCount -gt 0) -or $ErrorCount -gt 0)){
   Send-PSSendGridMail `
@@ -334,9 +336,10 @@ if (($env:SM_NOTIFY_EMAIL_WITH_GRAPH -eq "True") -and (($SecretExpiryCount -gt 0
     -Attachments $attachments
 }
 
-if($env:SM_NOTIFY_MSTEAMS_WEBHOOK -eq "True"){
+if($env:SM_NOTIFY_MSTEAMS_WEBHOOK -eq "True" -and (($SecretExpiryCount -gt 0 -or $CertExpiryCount -gt 0) -or $ErrorCount -gt 0)) {
   PostWebhookNotification $OutputTableSecrets $OutputTableCerts 
 }
+
 
 if ($SecretExpiryCount -gt 0) {
   Remove-Item .\$keyVaultSecretReportFileName
