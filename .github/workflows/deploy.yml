@@ -87,27 +87,31 @@ jobs:
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --subscription ${{ secrets.SUBSCRIPTION_ID }} `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
             az deployment mg what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --management-group-id '${{ inputs.management_group_id }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
             az account set --subscription '${{ inputs.subscription_id }}'
             az deployment group what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --resource-group '${{ inputs.resource_group_name }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
             }
         shell: pwsh
 
@@ -122,27 +126,31 @@ jobs:
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --subscription '${{ secrets.SUBSCRIPTION_ID }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
             az deployment mg what-if `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --management-group-id '${{ inputs.management_group_id }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
             if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
               az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}'
               az deployment group what-if `
                 --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
                 --resource-group '${{ inputs.resource_group_name }}' `
-                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
             }
         shell: pwsh
 
@@ -183,27 +191,31 @@ jobs:
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
               --subscription $subId `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
             az deployment tenant create `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
           az deployment mg create `
             --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
             --location '${{ inputs.location }}' `
             --management-group-id '${{ inputs.management_group_id }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
           if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
             az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}'
             az deployment group create `
               --name '${{ inputs.deployment_name }}-${{ env.current_time }}' `
               --resource-group '${{ inputs.resource_group_name }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
           }
         shell: pwsh
 
@@ -211,33 +223,68 @@ jobs:
         if: inputs.mode == 'deploy'
         run: |
           $ErrorActionPreference = 'stop'
-          if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
-            az account set --subscription ${{ secrets.SUBSCRIPTION_ID }}'
-            az deployment sub create `
+          if (${{ secrets.SENDGRID_API_TOKEN }} -or ${{secrets.MSTEAMS_WEBHOOK_URI}}){
+            if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
+              az account set --subscription ${{ secrets.SUBSCRIPTION_ID }}'
+              az deployment sub create `
+                --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --subscription '${{ secrets.SUBSCRIPTION_ID }}}' `
+                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
+              az deployment tenant create `
+                --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
+            az deployment mg create `
               --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
-              --subscription '${{ secrets.SUBSCRIPTION_ID }}}' `
-              --template-file ${{ runner.workspace }}/deploy/main.json `
-              --parameters parameters.json
+              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+              --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
+              az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}''
+              az deployment group create `
+                --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
+                --resource-group '${{ inputs.resource_group_name }}' `
+                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json `
+                --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json --parameters sendGridAPIToken=${{ secrets.SENDGRID_API_TOKEN }} msTeamsWebhookUri=${{secrets.MSTEAMS_WEBHOOK_URI}})
+            }
           }
-          if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
-            az deployment tenant create `
+          else{
+            if ('${{ inputs.az_deployment_type }}' -eq "subscription" ){
+              az account set --subscription ${{ secrets.SUBSCRIPTION_ID }}'
+              az deployment sub create `
+                --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --subscription '${{ secrets.SUBSCRIPTION_ID }}}' `
+                --template-file ${{ runner.workspace }}/deploy/main.json `
+                --parameters parameters.json
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "tenant" ){
+              az deployment tenant create `
+                --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
+                --location '${{ inputs.location }}' `
+                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
+            az deployment mg create `
               --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
               --location '${{ inputs.location }}' `
+              --management-group-id '${{ inputs.management_group_id }}' `
               --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
-          }
-          if ('${{ inputs.az_deployment_type }}' -eq "managementgroup" ){
-          az deployment mg create `
-            --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
-            --location '${{ inputs.location }}' `
-            --management-group-id '${{ inputs.management_group_id }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
-          }
-          if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
-            az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}''
-            az deployment group create `
-              --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
-              --resource-group '${{ inputs.resource_group_name }}' `
-              --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
-          }
+            }
+            if ('${{ inputs.az_deployment_type }}' -eq "resourcegroup" ){
+              az account set --subscription '${{ secrets.SUBSCRIPTION_ID }}''
+              az deployment group create `
+                --name '${{ inputs.deployment_name }}_${{ env.current_time }}' `
+                --resource-group '${{ inputs.resource_group_name }}' `
+                --template-file ${{ runner.workspace }}/deploy/${{ inputs.template_file_name }}.json --parameters ${{ runner.workspace }}/deploy/${{ inputs.parameter_file_name }}.parameters.json
+            }
+          }    
         shell: pwsh

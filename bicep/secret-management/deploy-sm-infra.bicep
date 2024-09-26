@@ -5,6 +5,14 @@ param tags object
 @description('The function app which will perform the secrets management tasks. Parsed directly via workflow/pipeline deployment')
 param functionAppName string
 
+@secure()
+@description('The Sendgrid API token required for the solution to forward email address notifications')
+param sendGridAPIToken string = ''
+
+@secure()
+@description('The MS Teams webhook uri provided to send MS Team notifications of expiring secrets.')
+param msTeamsWebhookUri string = ''
+
 @description('The primary resource group for the secrets management utility resources. Parsed directly via workflow/pipeline deployment')
 param resourceGroupName string
 
@@ -58,15 +66,11 @@ var containers = [
 var placeholderSecrets = [
   {
     name: 'sendGridToken'
-    value: 'Replace this value with SendGrid API Key' // Do not replace values here on this variable. The value is a literal secret intended to be changed on the key vault itself. 
+    value: sendGridAPIToken
   }
   {
     name: 'msTeamsWebhookUri'
-    value: 'Replace this value with a MS Teams webhook uri' // Do not replace values here on this variable. The value is a literal secret intended to be changed on the key vault itself.
-  }
-  {
-    name: 'msTeamsWebhookUriSecondary'
-    value: 'Replace this value with a MS Teams webhook uri' // Do not replace values here on this variable. The value is a literal secret intended to be changed on the key vault itself.
+    value: msTeamsWebhookUri
   }
 ]
 
@@ -78,7 +82,6 @@ var defaultAppSettings = {
   SM_TENANT_ID: tenant().tenantId
   SM_SENDGRID_TOKEN: '@Microsoft.KeyVault(VaultName=${kv.outputs.name};SecretName=${placeholderSecrets[0].name})'
   SM_MSTEAMS_WEBHOOK_URI: '@Microsoft.KeyVault(VaultName=${kv.outputs.name};SecretName=${placeholderSecrets[1].name})'
-  SM_MSTEAMS_WEBHOOK_URI_SECONDARY: '@Microsoft.KeyVault(VaultName=${kv.outputs.name};SecretName=${placeholderSecrets[2].name})'
 }
 
 var finalAppSettings = union(defaultAppSettings, appSettings)
@@ -102,19 +105,18 @@ module kv '../modules/key-vault/vaults/main.bicep' = {
   }
 }
 
-// Replace value with sendgrid API value post deployment
-// module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets)): {
-//   name: 'create_kv_secret-${i}'
-//   scope: rg
-//   dependsOn: [
-//     kv
-//   ]
-//   params: {
-//     keyVaultName: kv.outputs.name
-//     name: placeholderSecrets[i].name
-//     value: placeholderSecrets[i].value
-//   }
-// }]
+module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets)): {
+  name: 'create_kv_secret-${i}'
+  scope: rg
+  dependsOn: [
+    kv
+  ]
+  params: {
+    keyVaultName: kv.outputs.name
+    name: placeholderSecrets[i].name
+    value: placeholderSecrets[i].value
+  }
+}]
 
 // Deploys storage account
 module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = [ for i in range(0, (length(storageAccountArray))) : {
@@ -213,7 +215,7 @@ var roleDefinitionId = [
   subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6') // Key Vault Secrets User 
 ]
 
-//Grants function RBAC permissions to KV
+//Grants function RBAC permissions to the solutio's KV
 module rbacAssignments '../modules/authorization/role-assignments/main.bicep' = [ for i in range(0, length(roleDefinitionId)): {
   name: 'deploy_RbacPermissions-${i}'
   scope: resourceGroup(resourceGroupName)

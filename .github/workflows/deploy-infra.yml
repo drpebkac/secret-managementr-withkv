@@ -35,7 +35,7 @@ jobs:
       id-token: write # Require write permission to Fetch an OIDC token.
       contents: read
     uses: drpebkac/secret-managementr-withkv/.github/workflows/build.yml@main
-    secrets: inherit # wtf github workflow
+    secrets: inherit
     with:
       test_trigger: ${{ github.event_name }}
       template_folder_path: ${{ needs.initialise_vars.outputs.template_folder_path }}
@@ -53,7 +53,7 @@ jobs:
       id-token: write
       contents: read
     uses: drpebkac/secret-managementr-withkv/.github/workflows/deploy.yml@main
-    secrets: inherit # wtf github workflow
+    secrets: inherit
     with:
       az_deployment_type: 'subscription'
       environment: ${{ needs.initialise_vars.outputs.environment }}

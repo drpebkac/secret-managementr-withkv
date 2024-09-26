@@ -71,11 +71,39 @@ function PostWebhookNotification($OutputExpiration)
   }
 }
 
+function CleanStaleSecrets($CleanupTable)
+{
+  foreach($StaleSecret in $CleanupTable)
+  {
+    $StaleSecretAppId = $StaleSecret.ApplicationAppId
+    $StaleSecretKeyId = $StaleSecret.KeyId
+    
+    Write-Host "Removing stale secret for application " $StaleSecret.ApplicationName
+
+    if($env:SM_ENABLE_STALE_SECRET_CLEANUP -eq "True")
+    {
+      Remove-AzADAppCredential -ApplicationId $StaleSecretAppId -KeyId $StaleSecretKeyId -Confirm:$false -ErrorVariable ErrorDump
+    }
+    else
+    {
+      Write-Host "SM_ENABLE_STALE_SECRET_CLEANUP is disabled, only read operations is appliable to this function app run."
+    }
+
+    if($(($ErrorDump).Exception).Message -eq "[Authorization_RequestDenied] : Insufficient privileges to complete the operation.")
+    {
+      Write-Host "The customer's service principal does not have permissions to perform removals of secrets"
+      return 
+    }
+  }
+}
+
+
 function AppendExpiryReport(
   $TenantName,
   $AppId,
   $AppDisplayname,
   $SecretDescription,
+  $CredType,
   $SecretExpiryDate,
   $Status) {
 
@@ -85,6 +113,7 @@ function AppendExpiryReport(
     TenantName        = $TenantName
     AppId             = $AppId
     AppDisplayname    = $AppDisplayname
+    Type              = $CredType
     SecretDescription = $SecretDescription
     SecretExpiryDate  = $SecretExpiryDate ? $SecretExpiryDate.ToString("dd MMM yyyy hh:mm:ss") : ""
     Status            = $Status
@@ -120,6 +149,8 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
         ApplicationAppId   = $AppRegAppId
         AzureADObjectId    = $AppRegObjectId
         Displayname        = $AppRegDisplayName
+        Type               = $($AppRegCredential).Type
+        KeyId              = $($AppRegCredential).KeyId
         Description        = $($AppRegCredential).DisplayName
         SecretCreationDate = $($AppRegCredential).StartDateTime
         SecretExpiryDate   = $($AppRegCredential).EndDateTime
@@ -131,14 +162,29 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
         ApplicationAppId   = $AppRegAppId
         AzureADObjectId    = $AppRegObjectId
         Displayname        = $AppRegDisplayName
-        Description        = "NULL"
-        SecretCreationDate = "NULL"
-        SecretExpiryDate   = "NULL"
+        Type               = "No secrets or certs detected"
+        KeyId              = "No secrets or certs detected"
+        Description        = "No secrets or certs detected"
+        SecretCreationDate = "No secrets or certs detected"
+        SecretExpiryDate   = "No secrets or certs detected"
       }
     }
   }
 
   foreach ($App in $SummaryTable) {
+
+    $ExpiredStatus = "Expired"
+    $NearExpiryStatus = "Near Expiry"
+
+    if(!$($App.Type))
+    {
+      $CredType = "Secret"
+    }
+    else
+    {
+      $CredType = "Certificate"
+    }
+
     if ($($App.SecretExpiryDate).GetType().toString() -eq 'System.DateTime') {
       Write-Host "App $($App.DisplayName) has single secret"
 
@@ -148,12 +194,27 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
       if ($CurrentDate -gt $DateToExpiry) {
         Write-Host "App $($App.DisplayName) secret has expired"
 
+        if($CurrentDate -gt $($DateToExpiry).AddDays(365))
+        {
+          Write-Host "App $($App.DisplayName) secret has expired for over 365 days."
+
+          $CleanupTable += @{
+            ApplicationAppId = $App.ApplicationAppId
+            ApplicationName = $App.Displayname
+            KeyId = $App.KeyId
+          }
+
+          $ExpiredStatus = "Expired (Over 365 days)"
+
+        }
+
         $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $App.Description $App.SecretExpiryDate $ExpiredStatus
+
       }
       elseif (($CurrentDate -le $DateToExpiry) -and ($CurrentDate -ge $DateToTrigger)) {
 
         Write-Host "App $($App.DisplayName) secret is within near expiry period"
-        $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $App.Description $App.SecretExpiryDate $NearExpiryStatus
+        $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $App.Description $CredType $App.SecretExpiryDate $NearExpiryStatus
       }
     }
 
@@ -186,7 +247,23 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
         # Initial run to report all secrets in the app registration, including expired ones
         if ($CurrentDate -gt $DateToExpiry) {
           Write-Host "App $($App.DisplayName) secret has expired"
+
+          if($CurrentDate -gt $($DateToExpiry).AddDays(365))
+          {
+            Write-Host "App $($App.DisplayName) secret has expired for over 365 days."
+  
+            $CleanupTable += @{
+              ApplicationAppId = $($App.ApplicationAppId)
+              ApplicationName = $($App.DisplayName)
+              KeyId = $($App).KeyId[$i]
+            }
+
+            $ExpiredStatus = "Expired (Over 365 days)"
+
+          }
+
           $ExpirationTable += AppendExpiryReport $App.TenantName $App.ApplicationAppId $App.DisplayName $($App).Description[$i] $DateToExpiry "$ExpiredStatus$RenewedStatus"
+
         }
         elseif (($CurrentDate -le $DateToExpiry) -and ($CurrentDate -ge $DateToTrigger)) {
           Write-Host "App $($App.DisplayName) secret is within near expiry period"
@@ -201,6 +278,11 @@ function Main($CurrentDate, $RootTenantAppExclusions) {
     else {
       Write-Host "App $($App.DisplayName) has no secrets"
     }
+  }
+
+  if($CleanupTable -and $env:SM_ENABLE_STALE_SECRET_CLEANUP -eq "True")
+  {
+    CleanStaleSecrets $CleanupTable
   }
 
   return $ExpirationTable

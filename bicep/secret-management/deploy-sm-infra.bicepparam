@@ -36,11 +36,12 @@ param appSettings = {
   SM_CLIENT_NAME: 'ccv' // Client name to be used in the report
   SM_NEAR_EXPIRY_DAYS: 28 // Number of days to look back for secrets that are about to expire
   SM_APP_EXCLUSION_LIST: '' // Comma separated list of app registrations to exclude from the report
-  SM_NOTIFY_MSTEAMS_WEBHOOK: 'False' // Use 'True or 'False'v
-  SM_NOTIFY_EMAIL_WITH_GRAPH: 'True' // Use 'True or 'False'
-  SM_NOTIFY_EMAIL_WITH_SENDGRID: 'False' // Use 'True or 'False'
-  SM_NOTIFY_EMAIL_FROM_ADDRESS: 'itsupport@ittttt.it' // Email address to send the report from
-  SM_NOTIFY_EMAIL_TO_ADDRESS: 'abc@def.hij,klm@nop' // Comma separated list of email addresses to send the report to
+  SM_ENABLE_STALE_SECRET_CLEANUP: 'False' // Use 'True or 'False'
+  SM_NOTIFY_MSTEAMS_WEBHOOK: 'True' // Use 'True or 'False'v
+  SM_NOTIFY_EMAIL_WITH_GRAPH: 'False' // Use 'True or 'False'
+  SM_NOTIFY_EMAIL_WITH_SENDGRID: 'True' // Use 'True or 'False'
+  SM_NOTIFY_EMAIL_FROM_ADDRESS: 'No-reply@eventsair.com' // Email address to send the report from
+  SM_NOTIFY_EMAIL_TO_ADDRESS: 'bob.nguyen@arinco.com.au' // Comma separated list of email addresses to send the report to
   SM_APP_REG_REPORT_MAIL_SUBJECT: '[IMPORTANT] Your app registration secrets are due to expire'
   SM_APP_REG_REPORT_MAIL_MESSAGE: '<p>Hello<br>\n<br>\nPlease be advised that you have app registration secrets that are due to expire. <br>\n<br>\nAttached is a report listing the secrets.<br>\n<br>\nIt is crucial the secrets listed are renewed, prior to its expiry date to avoid downtime with your services. <br>\n<br>\nThank you</p>'
   SM_KEY_VAULT_REPORT_MAIL_SUBJECT: '[IMPORTANT] Your key vault secrets are due to expire'
