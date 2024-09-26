@@ -103,18 +103,18 @@ module kv '../modules/key-vault/vaults/main.bicep' = {
 }
 
 // Replace value with sendgrid API value post deployment
-module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets)): {
-  name: 'create_kv_secret-${i}'
-  scope: rg
-  dependsOn: [
-    kv
-  ]
-  params: {
-    keyVaultName: kv.outputs.name
-    name: placeholderSecrets[i].name
-    value: placeholderSecrets[i].value
-  }
-}]
+// module kvSecrets '../modules/key-vault/vaults-secrets/main.bicep' = [ for i in range(0, length(placeholderSecrets)): {
+//   name: 'create_kv_secret-${i}'
+//   scope: rg
+//   dependsOn: [
+//     kv
+//   ]
+//   params: {
+//     keyVaultName: kv.outputs.name
+//     name: placeholderSecrets[i].name
+//     value: placeholderSecrets[i].value
+//   }
+// }]
 
 // Deploys storage account
 module storageAccountModule '../modules/storage/storage-accounts/main.bicep' = [ for i in range(0, (length(storageAccountArray))) : {

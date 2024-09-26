@@ -3,14 +3,23 @@ using namespace System.Net
 # Input bindings are passed in via param block.
 param($Timer)
 
-function PostWebhookNotification($OutputTableCerts,$OutputTableSecrets)
+function PostWebhookNotification($OutputTableCerts,$OutputTableSecrets) 
 {
   $RootOrgName = $env:SM_CLIENT_NAME
   $MSTeamsUri = $env:SM_MSTEAMS_WEBHOOK_URI
-  $MSTeamsUriSecondary = $env:SM_MSTEAMS_WEBHOOK_URI_SECONDARY
-  $MSTeamsWebhookUriArray = @($MSTeamsUri,$MSTeamsUriSecondary)
-  $UnionedOutputTable = @($OutputTableCerts,$OutputTableSecrets)
-  
+  $MSTeamsWebhookUriArray = @($MSTeamsUri)
+  $InputTables = @($OutputTableSecrets,$OutputTableCerts)
+  $EntryTable = @()
+
+  # Key vault object tables are not hash like app registrations. This method deserialises the array table into key value objects
+  foreach($Table in $InputTables)
+  {
+    foreach($Object in $Table)
+    {
+      $EntryTable += $Object
+    }
+  }
+
   if($MSTeamsWebhookUriArray)
   {
     foreach($Uri in $MSTeamsWebhookUriArray)
@@ -20,51 +29,48 @@ function PostWebhookNotification($OutputTableCerts,$OutputTableSecrets)
         continue
       }
 
-      foreach($Array in $UnionedOutputTable)
+      $Sections = @()
+
+      foreach($Entry in $EntryTable)
       {
-        $Sections = @()
-
-        foreach($Entry in $Array)
+        $Facts = @()
+        $Keys = ($Entry | Get-Member -MemberType "NoteProperty").Name
+        
+        foreach($Key in $Keys)
         {
-          $Facts = @()
-          
-          foreach($Key in $entry.Keys)
-          {
-            $Fact = @{
-              name = $Key
-              value = $Entry[$Key]
-            }
-      
-            $Facts += $Fact
-      
+          $Fact = @{
+            name = $Key + ':'
+            value = $Entry.$Key
           }
-      
-          $Section = @{
-            facts = $Facts
-          }
-            
-          $Sections += @($Section)
-            
-          $MSTeamsBody = @{
-            Title = "$RootOrgName - Expiring Secrets for Key Vault Secrets/Certificates"
-            Text = "This is a MS Teams notification to advise that there are expiring secrets for Key Vault objects."
-            Sections = $Sections
-          } | ConvertTo-Json -Depth 20
-
-          $PostToTeams = Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
-
-          if($($PostToTeams).Content -like "Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 500 with ContextId*")
-          {
-            $MSTeamsBody = @{
-              Title = "$RootOrgName - Expiring Secrets for Secrets/Certificates"
-              Text = "This customer has exceeded the number of expiring secrets for a Microsoft Teams webhook to handle. Please refer the customer's full csv report for details."
-              Sections = ""
-            } | ConvertTo-Json -Depth 20
-
-            Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
-          }
+        
+          $Facts += $Fact
         }
+        
+        $Section = @{
+          facts = $Facts
+        }
+        $Sections += @($Section)
       }
+
+      $MSTeamsBody = @{
+        Title = "$RootOrgName - Expiring Secrets for Key Vault Secrets/Certificates"
+        Text = "This is a MS Teams notification to advise that there are expiring secrets for Key Vault objects."
+        Sections = $Sections
+      } | ConvertTo-Json -Depth 20
+  
+      $PostToTeams = Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
+  
+      if($($PostToTeams).Content -like "Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 500 with ContextId*")
+      {
+        $MSTeamsBody = @{
+          Title = "$RootOrgName - Expiring Secrets for Secrets/Certificates"
+          Text = "This customer has exceeded the number of expiring secrets for a Microsoft Teams webhook to handle. Please refer the customer's full csv report for details."
+          Sections = ""
+        } | ConvertTo-Json -Depth 20
+  
+        Invoke-WebRequest -Method POST -body $MSTeamsBody -uri $Uri -ContentType "application/json"
+      }
+
     }
   }
 }
@@ -130,7 +136,10 @@ function Get-Expiry-Secret($KVName, $SubscriptionName, $RG) {
       }
       else {
         # Always add secrets with no expiry to report
-        $addToReport = $true
+        #$addToReport = $true
+
+        # Don't include certs with no expiry for noise reduction 
+        $addToReport = $false
       }
 
       if ($addToReport -eq $true) {
@@ -178,7 +187,10 @@ function Get-Expiry-Cert($KVName, $SubscriptionName, $RG) {
     }
     else {
       # Always add certs with no expiry to report
-      $addToReport = $true
+      #$addToReport = $true
+      
+      # Don't include certs with no expiry for noise reduction 
+      $addToReport = $false
     }
 
     if ($addToReport -eq $true) {
@@ -253,6 +265,7 @@ foreach ($Sub in $Subs) {
 }
 
 $attachments = @()
+$sendGridAttachments = @()
 $date = Get-Date -AsUTC -Format %d-MM-yyyy
 $keyVaultSecretReportFileName = "keyvault-secret-expiryreport-$($date).csv"
 $SecretExpiryCount = $($OutputTableSecrets).count
@@ -265,9 +278,10 @@ if ($SecretExpiryCount -gt 0) {
   Push-OutputBinding -Name storeSecretExpiryReport -Value $OutputToBlobSecretsExpiryReport
 
   $attachments += @{"Name" = $keyVaultSecretReportFileName; "Content" = $OutputToBlobSecretsExpiryReport; "ContentType" = "text/csv" }
+  $sendGridAttachments += ".\$keyVaultSecretReportFileName"
 }
 
-$keyVaultCertReportFileName = "keyvault-secret-expiryreport-$($date).csv"
+$keyVaultCertReportFileName = "keyvault-cert-expiryreport-$($date).csv"
 $CertExpiryCount = $($OutputTableCerts).count
 Write-Host "$CertExpiryCount Certs expired or nearing expiry"
 
@@ -279,6 +293,7 @@ if ($CertExpiryCount -gt 0) {
   Push-OutputBinding -Name storeCertExpiryReport -Value $OutputToBlobCertsExpiryReport
 
   $attachments += @{"Name" = $keyVaultCertReportFileName; "Content" = $OutputToBlobCertsExpiryReport; "ContentType" = "text/csv" }
+  $sendGridAttachments += ".\$keyVaultCertReportFileName"
 }
 
 $keyVaultErrorLogFileName = "keyvault-errorlog-$($date).csv"
@@ -294,6 +309,7 @@ if ($ErrorCount -gt 0) {
   Push-OutputBinding -Name kvErrorLogs -Value $OutputToBlobErrorLogs
 
   $attachments += @{"Name" = $keyVaultErrorLogFileName; "Content" = $OutputToBlobErrorLogs; "ContentType" = "text/csv" }
+  $sendGridAttachments += ".\$keyVaultErrorLogFileName"
 }
 
 if($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True" -and (($SecretExpiryCount -gt 0 -or $CertExpiryCount -gt 0) -or $ErrorCount -gt 0)){
@@ -302,7 +318,7 @@ if($env:SM_NOTIFY_EMAIL_WITH_SENDGRID -eq "True" -and (($SecretExpiryCount -gt 0
     -ToAddress $env:SM_NOTIFY_EMAIL_TO_ADDRESS `
     -Subject $env:SM_KEY_VAULT_REPORT_MAIL_SUBJECT `
     -BodyAsHTML $env:SM_KEY_VAULT_REPORT_MAIL_MESSAGE `
-    -AttachmentPath "$keyVaultSecretReportFileName", ".\$keyVaultCertReportFileName" `
+    -AttachmentPath $sendGridAttachments `
     -Token $env:SM_SENDGRID_TOKEN
 
 }
@@ -319,7 +335,7 @@ if (($env:SM_NOTIFY_EMAIL_WITH_GRAPH -eq "True") -and (($SecretExpiryCount -gt 0
 }
 
 if($env:SM_NOTIFY_MSTEAMS_WEBHOOK -eq "True"){
-  PostWebhookNotification $OutputTableCerts $OutputTableSecrets
+  PostWebhookNotification $OutputTableSecrets $OutputTableCerts 
 }
 
 if ($SecretExpiryCount -gt 0) {
