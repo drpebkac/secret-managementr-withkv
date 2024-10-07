@@ -23,9 +23,9 @@ param tags = {
 
 param workspaceName = '${prefix}-law'
 
-param functionAppStorageAccountName = '${storagePrefix}fasa'
+param functionAppStorageAccountName = 'ccv12fddsfasa'
 
-param reportsStorageAccountName = '${storagePrefix}sa'
+param reportsStorageAccountName = 'ccv12fddssa'
 
 param kvName = '${prefix}-kv'
 
